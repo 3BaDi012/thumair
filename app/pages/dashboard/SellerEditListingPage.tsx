@@ -4,6 +4,7 @@ import { ImagePlus, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { userFacingFunctionError } from '../../lib/functionUserFacingError';
 import { LISTING_IMAGES_BUCKET, publicUrlForListingImage } from '../../lib/listingImageStorage';
+import { ListingForm, type ListingFormValues } from '../../components/listings/ListingForm';
 
 type Listing = {
   id: string;
@@ -36,6 +37,7 @@ export function SellerEditListingPage() {
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [formValues, setFormValues] = useState<ListingFormValues | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,6 +53,21 @@ export function SellerEditListingPage() {
       cancelled = true;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!listing) return;
+    setFormValues({
+      title: listing.title ?? '',
+      description: listing.description ?? '',
+      category: listing.category ?? '',
+      city: listing.city ?? '',
+      unit: listing.unit ?? '',
+      priceMin: listing.price_min != null ? String(listing.price_min) : '',
+      priceMax: listing.price_max != null ? String(listing.price_max) : '',
+      currency: listing.currency ?? 'SAR',
+      availableQuantity: listing.available_quantity != null ? String(listing.available_quantity) : '',
+    });
+  }, [listing]);
 
   useEffect(() => {
     const listingId = listing?.id;
@@ -76,22 +93,26 @@ export function SellerEditListingPage() {
   }, [listing?.id]);
 
   async function save() {
-    if (!listing) return;
+    if (!listing || !formValues) return;
     setError(null);
     setSaving(true);
     try {
+      const priceMin = formValues.priceMin.trim() ? Number(formValues.priceMin) : null;
+      const priceMax = formValues.priceMax.trim() ? Number(formValues.priceMax) : null;
+      const availableQuantity = formValues.availableQuantity.trim() ? Number(formValues.availableQuantity) : null;
+
       const { error: up } = await supabase
         .from('listings')
         .update({
-          title: listing.title,
-          description: listing.description,
-          category: listing.category,
-          unit: listing.unit,
-          price_min: listing.price_min,
-          price_max: listing.price_max,
-          currency: listing.currency,
-          available_quantity: listing.available_quantity,
-          city: listing.city,
+          title: formValues.title,
+          description: formValues.description.trim() ? formValues.description.trim() : null,
+          category: formValues.category || null,
+          unit: formValues.unit.trim() ? formValues.unit.trim() : null,
+          price_min: priceMin,
+          price_max: priceMax,
+          currency: formValues.currency || 'SAR',
+          available_quantity: availableQuantity,
+          city: formValues.city.trim() ? formValues.city.trim() : null,
         })
         .eq('id', listing.id);
       if (up) throw up;
@@ -157,8 +178,12 @@ export function SellerEditListingPage() {
         setImageError(
           'مجلد التخزين «listing-images» غير موجود على مشروع Supabase. افتح لوحة المشروع → SQL Editor وشغّل ملفات الهجرة الأحدث (0005 و 0006)، أو من Storage أنشئ دلواً باسم listing-images ثم أعد المحاولة.'
         );
+      } else if (lower.includes('duplicate key') || lower.includes('409') || lower.includes('conflict')) {
+        setImageError('تعذر رفع الصورة بسبب تعارض/تكرار. أعد المحاولة (قد يحدث هذا مؤقتاً).');
       } else if (lower.includes('row-level security') || lower.includes('rls')) {
         setImageError('لا تملك صلاحية رفع صور لهذا الإعلان. تأكد أنك مالك أو مدير المزرعة المرتبطة.');
+      } else if (lower.includes('failed to fetch') || lower.includes('network') || lower.includes('timeout')) {
+        setImageError('تعذر الاتصال بخدمة التخزين. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
       } else {
         setImageError(msg);
       }
@@ -285,74 +310,7 @@ export function SellerEditListingPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">العنوان</label>
-            <input
-              value={listing.title}
-              onChange={(e) => setListing({ ...listing, title: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">الوصف</label>
-            <textarea
-              value={listing.description ?? ''}
-              onChange={(e) => setListing({ ...listing, description: e.target.value })}
-              rows={4}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">التصنيف</label>
-              <input
-                value={listing.category ?? ''}
-                onChange={(e) => setListing({ ...listing, category: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">المدينة</label>
-              <input
-                value={listing.city ?? ''}
-                onChange={(e) => setListing({ ...listing, city: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">السعر الأدنى</label>
-              <input
-                type="number"
-                value={listing.price_min ?? ''}
-                onChange={(e) => setListing({ ...listing, price_min: e.target.value ? Number(e.target.value) : null })}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">السعر الأعلى</label>
-              <input
-                type="number"
-                value={listing.price_max ?? ''}
-                onChange={(e) => setListing({ ...listing, price_max: e.target.value ? Number(e.target.value) : null })}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">العملة</label>
-              <input
-                value={listing.currency}
-                onChange={(e) => setListing({ ...listing, currency: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-          </div>
-        </div>
+        {formValues && <ListingForm values={formValues} onChange={setFormValues} />}
       </div>
     </div>
   );

@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router';
 import { Mail, Lock, ShoppingCart, Store } from 'lucide-react';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../i18n/useT';
+import { dashboardPathForUser } from '../lib/dashboardPath';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { signInWithPassword, isAuthenticated } = useAuth();
+  const { signInWithPassword, isAuthenticated, user, refreshProfile } = useAuth();
+  const { locale, t } = useT();
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,8 +25,9 @@ export function LoginPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/home', { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (!isAuthenticated) return;
+    navigate(dashboardPathForUser(user), { replace: true });
+  }, [isAuthenticated, navigate, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,8 +35,8 @@ export function LoginPage() {
     setIsSubmitting(true);
     try {
       await signInWithPassword({ email: formData.email, password: formData.password });
-      const dashboardPath = formData.userType === 'farmer' ? 'farmer' : 'buyer';
-      navigate(`/dashboard/${dashboardPath}`);
+      const refreshed = await refreshProfile();
+      navigate(dashboardPathForUser(refreshed), { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ أثناء تسجيل الدخول');
     } finally {
@@ -47,17 +51,23 @@ export function LoginPage() {
           <Link to="/home" className="inline-block hover:opacity-80 transition mb-6">
             <ThumairLogoWithText />
           </Link>
-          <h1 className="text-3xl font-bold mt-4" style={{ color: '#0C4A6E' }}>تسجيل الدخول</h1>
-          <p className="text-gray-600 mt-2">مرحباً بك مجدداً في منصة ثمير</p>
+          <h1 className="text-3xl font-bold mt-4" style={{ color: '#0C4A6E' }}>
+            {t('auth.login')}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            {locale === 'en' ? 'Welcome back to Thumair' : 'مرحباً بك مجدداً في منصة ثمير'}
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {step === 1 ? (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center" style={{ color: '#0C4A6E' }}>
-                اختر نوع الحساب
+                {locale === 'en' ? 'Choose account type' : 'اختر نوع الحساب'}
               </h2>
-              <p className="text-gray-600 text-center mb-8">كيف تريد تسجيل الدخول؟</p>
+              <p className="text-gray-600 text-center mb-8">
+                {locale === 'en' ? 'How would you like to log in?' : 'كيف تريد تسجيل الدخول؟'}
+              </p>
 
               <div className="grid gap-6">
                 <button
@@ -67,8 +77,12 @@ export function LoginPage() {
                   <div className="size-16 bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-6 transition-transform">
                     <ShoppingCart className="size-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">مشتري</h3>
-                  <p className="text-sm text-gray-600">تسجيل الدخول كمشتري للمنتجات</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {locale === 'en' ? 'Buyer' : 'مشتري'}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {locale === 'en' ? 'Log in to buy products' : 'تسجيل الدخول كمشتري للمنتجات'}
+                  </p>
                 </button>
 
                 <button
@@ -78,16 +92,20 @@ export function LoginPage() {
                   <div className="size-16 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-6 transition-transform">
                     <Store className="size-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">تاجر / مزارع</h3>
-                  <p className="text-sm text-gray-600">تسجيل الدخول لإدارة منتجاتك</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {locale === 'en' ? 'Farmer / Seller' : 'تاجر / مزارع'}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {locale === 'en' ? 'Log in to manage your listings' : 'تسجيل الدخول لإدارة منتجاتك'}
+                  </p>
                 </button>
               </div>
 
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
-                  ليس لديك حساب؟{' '}
+                  {locale === 'en' ? "Don't have an account?" : 'ليس لديك حساب؟'}{' '}
                   <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-semibold">
-                    إنشاء حساب جديد
+                    {locale === 'en' ? 'Create a new account' : 'إنشاء حساب جديد'}
                   </Link>
                 </p>
               </div>
@@ -98,7 +116,7 @@ export function LoginPage() {
                 onClick={() => setStep(1)}
                 className="text-sky-600 hover:text-sky-700 mb-6 flex items-center gap-2 text-sm font-semibold"
               >
-                ← العودة
+                {locale === 'en' ? '← Back' : '← العودة'}
               </button>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -109,7 +127,7 @@ export function LoginPage() {
                 )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    البريد الإلكتروني
+                    {t('auth.email')}
                   </label>
                   <div className="relative">
                     <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -126,7 +144,7 @@ export function LoginPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    كلمة المرور
+                    {t('auth.password')}
                   </label>
                   <div className="relative">
                     <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -137,6 +155,7 @@ export function LoginPage() {
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       className="w-full pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                       placeholder="••••••••"
+                      autoComplete="current-password"
                     />
                   </div>
                 </div>

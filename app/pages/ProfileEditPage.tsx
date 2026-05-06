@@ -2,9 +2,15 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { User, Mail, Phone, Camera, ArrowRight, Save, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../i18n/useT';
+import { uploadAvatar } from '../lib/avatarStorage';
+import { supabase } from '../lib/supabaseClient';
 
 export function ProfileEditPage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
+  const { locale, t } = useT();
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [profileData, setProfileData] = useState({
     name: user?.name || 'أحمد محمد',
     email: user?.email || 'ahmed@example.com',
@@ -12,10 +18,12 @@ export function ProfileEditPage() {
     image: user?.image || '',
     location: 'الرياض',
   });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileData({ ...profileData, image: reader.result as string });
@@ -24,9 +32,33 @@ export function ProfileEditPage() {
     }
   };
 
-  const handleSave = () => {
-    // Save logic here
-    alert('تم حفظ التغييرات بنجاح');
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    setError(null);
+    try {
+      let avatarUrlToSave: string | null = null;
+      if (avatarFile) {
+        const uploaded = await uploadAvatar({ userId: user.id, file: avatarFile });
+        avatarUrlToSave = uploaded.publicUrl;
+      }
+
+      const update: Record<string, unknown> = {
+        display_name: profileData.name,
+        phone: profileData.phone || null,
+      };
+      if (avatarUrlToSave) update.avatar_url = avatarUrlToSave;
+
+      const { error: upErr } = await supabase.from('profiles').update(update).eq('id', user.id);
+      if (upErr) throw upErr;
+
+      await refreshProfile();
+      setAvatarFile(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : (locale === 'en' ? 'Failed to save profile' : 'تعذر حفظ الملف الشخصي'));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const dashboardPath = user?.userType === 'buyer' ? '/dashboard/buyer' : '/dashboard/farmer';
@@ -40,13 +72,20 @@ export function ProfileEditPage() {
             className="inline-flex items-center gap-2 text-sky-900 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition mb-4"
           >
             <ArrowRight className="size-5" />
-            العودة للوحة التحكم
+            {locale === 'en' ? 'Back to dashboard' : 'العودة للوحة التحكم'}
           </Link>
-          <h1 className="text-4xl font-bold text-sky-900 dark:text-white">تعديل الملف الشخصي</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">قم بتحديث معلوماتك الشخصية</p>
+          <h1 className="text-4xl font-bold text-sky-900 dark:text-white">{t('profile.editTitle')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            {locale === 'en' ? 'Update your personal info' : 'قم بتحديث معلوماتك الشخصية'}
+          </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+          {error && (
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
           {/* Profile Image Section */}
           <div className="text-center mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
             <div className="relative inline-block">
@@ -172,16 +211,17 @@ export function ProfileEditPage() {
             <div className="flex gap-4 pt-6">
               <button
                 onClick={handleSave}
+                disabled={isSaving}
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-sky-900 to-emerald-600 text-white rounded-lg hover:opacity-90 transition font-semibold"
               >
                 <Save className="size-5" />
-                حفظ التغييرات
+                {isSaving ? (locale === 'en' ? 'Saving…' : 'جارٍ الحفظ...') : locale === 'en' ? 'Save changes' : 'حفظ التغييرات'}
               </button>
               <Link
                 to={dashboardPath}
                 className="px-8 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-semibold"
               >
-                إلغاء
+                {locale === 'en' ? 'Cancel' : 'إلغاء'}
               </Link>
             </div>
           </div>

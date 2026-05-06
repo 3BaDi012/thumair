@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
+import { ListingForm, type ListingFormValues } from '../../components/listings/ListingForm';
 
 type Org = { id: string; name: string; type: string };
 
@@ -15,9 +16,17 @@ export function SellerNewListingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [city, setCity] = useState('');
+  const [values, setValues] = useState<ListingFormValues>({
+    title: '',
+    description: '',
+    category: '',
+    city: '',
+    unit: '',
+    priceMin: '',
+    priceMax: '',
+    currency: 'SAR',
+    availableQuantity: '',
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +38,10 @@ export function SellerNewListingPage() {
         .eq('type', 'farm')
         .order('created_at', { ascending: false });
       if (cancelled) return;
-      if (error) return;
+      if (error) {
+        setError(error.message);
+        return;
+      }
       setOrgs((data ?? []) as Org[]);
       if ((data ?? []).length > 0) setOrgId((data ?? [])[0].id);
     }
@@ -61,7 +73,7 @@ export function SellerNewListingPage() {
 
   async function onCreateDraft() {
     setError(null);
-    if (!title.trim()) {
+    if (!values.title.trim()) {
       setError('أدخل عنوان الإعلان');
       return;
     }
@@ -73,13 +85,23 @@ export function SellerNewListingPage() {
         effectiveOrgId = await createFarmOrgAndMembership();
       }
 
+      const priceMin = values.priceMin.trim() ? Number(values.priceMin) : null;
+      const priceMax = values.priceMax.trim() ? Number(values.priceMax) : null;
+      const availableQuantity = values.availableQuantity.trim() ? Number(values.availableQuantity) : null;
+
       const { data: listing, error: listingError } = await supabase
         .from('listings')
         .insert({
           org_id: effectiveOrgId,
-          title,
-          category: category || null,
-          city: city || null,
+          title: values.title,
+          description: values.description.trim() ? values.description.trim() : null,
+          category: values.category || null,
+          unit: values.unit.trim() ? values.unit.trim() : null,
+          price_min: priceMin,
+          price_max: priceMax,
+          currency: values.currency || 'SAR',
+          available_quantity: availableQuantity,
+          city: values.city.trim() ? values.city.trim() : null,
           status: 'draft',
         })
         .select('id')
@@ -102,7 +124,8 @@ export function SellerNewListingPage() {
 
         {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-4">{error}</div>}
 
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-5">
+        <div className="space-y-5">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-5">
           {orgs.length > 0 ? (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">المزرعة</label>
@@ -130,37 +153,9 @@ export function SellerNewListingPage() {
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">إذا لم تكن لديك مزرعة مسجلة، سننشئ واحدة ونربطك كـ Owner.</p>
             </div>
           )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">عنوان الإعلان</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="مثال: تمر سكري فاخر"
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-            />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">التصنيف</label>
-              <input
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="مثال: التمور"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">المدينة</label>
-              <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="مثال: القصيم"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
-              />
-            </div>
-          </div>
+          <ListingForm values={values} onChange={setValues} />
 
           <button
             type="button"

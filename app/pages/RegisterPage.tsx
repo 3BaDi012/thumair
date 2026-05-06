@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router';
 import { Mail, Lock, User, Phone, MapPin, ShoppingCart, Store } from 'lucide-react';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../i18n/useT';
+import { dashboardPathForUser } from '../lib/dashboardPath';
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { signUp, isAuthenticated } = useAuth();
+  const { signUp, isAuthenticated, refreshProfile, user } = useAuth();
+  const { locale, t } = useT();
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,8 +29,9 @@ export function RegisterPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/home', { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (!isAuthenticated) return;
+    navigate(dashboardPathForUser(user), { replace: true });
+  }, [isAuthenticated, navigate, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +49,11 @@ export function RegisterPage() {
         password: formData.password,
         displayName: formData.name,
         phone: formData.phone,
-        locale: 'ar',
+        locale: locale === 'en' ? 'en' : 'ar',
         userType: formData.userType === 'farmer' ? 'farmer' : 'buyer',
       });
-      const dashboardPath = formData.userType === 'farmer' ? 'farmer' : 'buyer';
-      navigate(`/dashboard/${dashboardPath}`);
+      const refreshed = await refreshProfile();
+      navigate(dashboardPathForUser(refreshed), { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ أثناء إنشاء الحساب');
     } finally {
@@ -64,17 +68,23 @@ export function RegisterPage() {
           <Link to="/home" className="inline-block hover:opacity-80 transition mb-6">
             <ThumairLogoWithText />
           </Link>
-          <h1 className="text-3xl font-bold mt-4" style={{ color: '#0C4A6E' }}>إنشاء حساب جديد</h1>
-          <p className="text-gray-600 mt-2">انضم إلى منصة ثمير الزراعية</p>
+          <h1 className="text-3xl font-bold mt-4" style={{ color: '#0C4A6E' }}>
+            {locale === 'en' ? 'Create a new account' : 'إنشاء حساب جديد'}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            {locale === 'en' ? 'Join Thumair marketplace' : 'انضم إلى منصة ثمير الزراعية'}
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {step === 1 && (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center" style={{ color: '#0C4A6E' }}>
-                اختر نوع الحساب
+                {locale === 'en' ? 'Choose account type' : 'اختر نوع الحساب'}
               </h2>
-              <p className="text-gray-600 text-center mb-8">اختر النوع الذي يناسبك للاستمتاع بتجربة ثمير</p>
+              <p className="text-gray-600 text-center mb-8">
+                {locale === 'en' ? 'Choose the type that fits you' : 'اختر النوع الذي يناسبك للاستمتاع بتجربة ثمير'}
+              </p>
 
               <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 <button
@@ -84,12 +94,16 @@ export function RegisterPage() {
                   <div className="size-24 bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
                     <ShoppingCart className="size-12" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">مشتري</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    {locale === 'en' ? 'Buyer' : 'مشتري'}
+                  </h3>
                   <p className="text-gray-600 leading-relaxed">
-                    أنا مهتم بشراء المنتجات الزراعية الطازجة مباشرة من المزارعين
+                    {locale === 'en'
+                      ? 'I want to buy fresh produce directly from farms'
+                      : 'أنا مهتم بشراء المنتجات الزراعية الطازجة مباشرة من المزارعين'}
                   </p>
                   <div className="mt-4 inline-flex items-center gap-2 text-sky-600 font-semibold">
-                    اختر هذا الخيار
+                    {locale === 'en' ? 'Choose' : 'اختر هذا الخيار'}
                     <svg className="size-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
@@ -103,12 +117,16 @@ export function RegisterPage() {
                   <div className="size-24 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
                     <Store className="size-12" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">تاجر / مزارع</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    {locale === 'en' ? 'Farmer / Seller' : 'تاجر / مزارع'}
+                  </h3>
                   <p className="text-gray-600 leading-relaxed">
-                    أنا أملك مزرعة أو أبيع منتجات زراعية وأريد عرضها على المنصة
+                    {locale === 'en'
+                      ? 'I want to sell products and manage my listings'
+                      : 'أنا أملك مزرعة أو أبيع منتجات زراعية وأريد عرضها على المنصة'}
                   </p>
                   <div className="mt-4 inline-flex items-center gap-2 text-emerald-600 font-semibold">
-                    اختر هذا الخيار
+                    {locale === 'en' ? 'Choose' : 'اختر هذا الخيار'}
                     <svg className="size-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
@@ -118,9 +136,9 @@ export function RegisterPage() {
 
               <div className="mt-8 text-center">
                 <p className="text-gray-600">
-                  لديك حساب بالفعل؟{' '}
+                  {locale === 'en' ? 'Already have an account?' : 'لديك حساب بالفعل؟'}{' '}
                   <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold">
-                    تسجيل الدخول
+                    {t('auth.login')}
                   </Link>
                 </p>
               </div>
@@ -226,6 +244,7 @@ export function RegisterPage() {
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         className="w-full pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                         placeholder="••••••••"
+                        autoComplete="new-password"
                       />
                     </div>
                   </div>
@@ -243,6 +262,7 @@ export function RegisterPage() {
                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                         className="w-full pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                         placeholder="••••••••"
+                        autoComplete="new-password"
                       />
                     </div>
                   </div>

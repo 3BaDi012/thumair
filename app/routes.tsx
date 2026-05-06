@@ -25,6 +25,8 @@ import { FavoritesPage } from './pages/FavoritesPage';
 import { SellerListingsPage } from './pages/dashboard/SellerListingsPage';
 import { SellerNewListingPage } from './pages/dashboard/SellerNewListingPage';
 import { SellerEditListingPage } from './pages/dashboard/SellerEditListingPage';
+import { RequireBuyer } from './components/RequireBuyer';
+import { RequireSeller } from './components/RequireSeller';
 
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
 const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })));
@@ -54,7 +56,11 @@ export const router = createBrowserRouter([
       { path: '/register', Component: RegisterPage },
       {
         path: '/dashboard',
-        Component: DashboardLayout,
+        element: (
+          <RequireSeller>
+            <DashboardLayout />
+          </RequireSeller>
+        ),
         children: [
           { path: 'farmer', Component: FarmerDashboard },
           { path: 'listings', Component: SellerListingsPage },
@@ -65,7 +71,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/dashboard/buyer',
-        Component: BuyerDashboardLayout,
+        element: (
+          <RequireBuyer>
+            <BuyerDashboardLayout />
+          </RequireBuyer>
+        ),
         children: [{ index: true, Component: BuyerDashboard }],
       },
       { path: '/products', Component: ProductsPage },

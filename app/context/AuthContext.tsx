@@ -34,7 +34,7 @@ interface AuthContextType {
   }) => Promise<void>;
   signOut: () => Promise<void>;
   logout: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  refreshProfile: () => Promise<AppUser | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,30 +71,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  async function loadProfile(sUser: SupabaseUser | null): Promise<void> {
+  async function loadProfile(sUser: SupabaseUser | null): Promise<AppUser | null> {
     if (!sUser) {
       setUser(null);
       setIsLoading(false);
-      return;
+      return null;
     }
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, display_name, locale, user_type, role, status')
+      .select('id, display_name, locale, user_type, role, status, avatar_url')
       .eq('id', sUser.id)
       .maybeSingle();
 
     if (error || !data) {
-      setUser({
+      const fallbackUser: AppUser = {
         id: sUser.id,
         email: sUser.email ?? '',
         name: sUser.email ?? 'User',
         locale: 'ar',
         role: 'user',
         status: 'active',
-      });
+      };
+      setUser(fallbackUser);
       setIsLoading(false);
-      return;
+      return fallbackUser;
     }
 
     // Force sign-out if banned
@@ -102,10 +103,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
       setUser(null);
       setIsLoading(false);
-      return;
+      return null;
     }
 
-    setUser({
+    const mappedUser: AppUser = {
       id: sUser.id,
       email: sUser.email ?? '',
       name: data.display_name ?? sUser.email ?? 'User',
@@ -113,8 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       userType: (data.user_type ?? undefined) as UserType | undefined,
       role: (data.role ?? 'user') as UserRole,
       status: (data.status ?? 'active') as UserStatus,
-    });
+      image: (data.avatar_url ?? undefined) as string | undefined,
+    };
+    setUser(mappedUser);
     setIsLoading(false);
+    return mappedUser;
   }
 
   useEffect(() => {
@@ -164,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
       },
       refreshProfile: async () => {
-        await loadProfile(supabaseUser);
+        return await loadProfile(supabaseUser);
       },
     };
   }, [supabaseUser, user, isLoading]);

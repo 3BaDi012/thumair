@@ -2,10 +2,12 @@ import { Link } from 'react-router';
 import { User, Moon, Sun, ArrowRight, ChevronLeft } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../i18n/useT';
 
 export function SettingsPage() {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const { user } = useAuth();
+  const { locale, t } = useT();
   const dashboardPath = user?.userType === 'buyer' ? '/dashboard/buyer' : '/dashboard/farmer';
 
   return (
@@ -17,10 +19,12 @@ export function SettingsPage() {
             className="inline-flex items-center gap-2 text-sky-900 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition mb-4"
           >
             <ArrowRight className="size-5" />
-            العودة للوحة التحكم
+            {locale === 'en' ? 'Back to dashboard' : 'العودة للوحة التحكم'}
           </Link>
-          <h1 className="text-4xl font-bold text-sky-900 dark:text-white">الإعدادات</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">إدارة إعدادات حسابك والتفضيلات</p>
+          <h1 className="text-4xl font-bold text-sky-900 dark:text-white">{t('settings.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            {locale === 'en' ? 'Manage your account and preferences' : 'إدارة إعدادات حسابك والتفضيلات'}
+          </p>
         </div>
 
         <div className="space-y-4">
@@ -36,10 +40,12 @@ export function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                    تعديل الملف الشخصي
+                    {t('profile.editTitle')}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    قم بتحديث معلوماتك الشخصية وصورة الملف الشخصي
+                    {locale === 'en'
+                      ? 'Update your details and profile picture'
+                      : 'قم بتحديث معلوماتك الشخصية وصورة الملف الشخصي'}
                   </p>
                 </div>
               </div>
@@ -60,10 +66,16 @@ export function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                    الوضع الداكن
+                    {locale === 'en' ? 'Dark mode' : 'الوضع الداكن'}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {isDarkMode ? 'الوضع الداكن مفعّل حالياً' : 'الوضع الفاتح مفعّل حالياً'}
+                    {locale === 'en'
+                      ? isDarkMode
+                        ? 'Dark mode is on'
+                        : 'Light mode is on'
+                      : isDarkMode
+                        ? 'الوضع الداكن مفعّل حالياً'
+                        : 'الوضع الفاتح مفعّل حالياً'}
                   </p>
                 </div>
               </div>

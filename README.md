@@ -25,6 +25,21 @@ Copy `.env.example` → `.env` and fill:
 npm run dev
 ```
 
+## Deploying to Vercel
+
+If the site shows a **blank white page**, the usual cause is missing **Vite** env vars at build/runtime:
+
+| Variable | Where to copy it |
+|----------|-------------------|
+| `VITE_SUPABASE_URL` | Supabase → Project Settings → API → Project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → `anon` `public` key |
+
+In Vercel: **Settings → Environment Variables**. Add both for **Production** (and **Preview** if you use preview deployments). Then **Redeploy**.
+
+Optional: `VITE_SENTRY_DSN` for client error reporting.
+
+The repo includes `vercel.json` with SPA rewrites and security headers. `connect-src` in the CSP allows `https://*.supabase.co` and `wss://*.supabase.co` for Supabase clients.
+
 ## Supabase: DB + RLS
 - Migrations live in `supabase/migrations/`:
   - `0001_init.sql`: tables + indexes + triggers

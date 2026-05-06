@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
-import { Mail, Phone, MapPin, Send, Twitter, Instagram, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, X, Instagram, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 export function ContactPage() {
@@ -233,12 +233,12 @@ export function ContactPage() {
                   <h3 className="font-semibold mb-4">تابعنا على</h3>
                   <div className="flex gap-4">
                     <a
-                      href="https://twitter.com/thumair_sa"
+                      href="https://x.com/thumair_sa"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="size-12 bg-white/10 backdrop-blur rounded-lg flex items-center justify-center hover:bg-emerald-500 transition"
                     >
-                      <Twitter className="size-6" />
+                      <X className="size-6" />
                     </a>
                     <a
                       href="https://instagram.com/thumair_sa"

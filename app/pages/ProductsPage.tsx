@@ -10,6 +10,8 @@ import { LanguageToggle } from '../components/LanguageToggle';
 import { NotificationBell } from '../components/NotificationBell';
 import { supabase } from '../lib/supabaseClient';
 import type { ListingSummary } from '../context/FavoritesContext';
+import { useT } from '../i18n/useT';
+import { CATEGORIES } from '../lib/categories';
 
 export function ProductsPage() {
   const { category } = useParams();
@@ -20,23 +22,12 @@ export function ProductsPage() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const { user, isAuthenticated } = useAuth();
+  const { t, locale } = useT();
 
-  const categoryMeta = useMemo(
-    () =>
-      [
-        { name: 'الفواكه', emoji: '🍎' },
-        { name: 'الخضروات', emoji: '🥬' },
-        { name: 'البذور', emoji: '🌱' },
-        { name: 'التمور', emoji: '🌴' },
-        { name: 'النخيل', emoji: '🌴' },
-        { name: 'الأعلاف', emoji: '🌾' },
-        { name: 'العسل', emoji: '🍯' },
-        { name: 'الأسمدة والمبيدات', emoji: '🧪' },
-        { name: 'تأجير المزارع', emoji: '🏡' },
-        { name: 'الخدمات', emoji: '🚜' },
-      ] as const,
-    []
-  );
+  const dashboardPath = useMemo(() => {
+    if (!user?.userType) return '/welcome';
+    return user.userType === 'buyer' ? '/dashboard/buyer' : '/dashboard/farmer';
+  }, [user?.userType]);
 
   const [listings, setListings] = useState<ListingSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -132,13 +123,13 @@ export function ProductsPage() {
     const total = listings.length;
     return [
       { name: 'الكل', emoji: '🌾', count: total },
-      ...categoryMeta.map((c) => ({
+      ...CATEGORIES.map((c) => ({
         name: c.name,
         emoji: c.emoji,
         count: categoryCounts.get(c.name) ?? 0,
       })),
     ];
-  }, [categoryCounts, listings.length, categoryMeta]);
+  }, [categoryCounts, listings.length]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -153,10 +144,10 @@ export function ProductsPage() {
             {isAuthenticated ? (
               <>
                 <Link
-                  to={user?.userType === 'buyer' ? '/dashboard/buyer' : '/dashboard/farmer'}
+                  to={dashboardPath}
                   className="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
                 >
-                  لوحة التحكم
+                  {t('nav.dashboard')}
                 </Link>
                 <NotificationBell onClick={() => setIsNotificationsOpen(true)} />
                 <button
@@ -169,14 +160,14 @@ export function ProductsPage() {
                   <div className="text-right">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">{user?.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {user?.userType === 'buyer' ? 'مشتري' : 'مزارع'}
+                      {user?.userType === 'buyer' ? (locale === 'en' ? 'Buyer' : 'مشتري') : user?.userType === 'farmer' ? (locale === 'en' ? 'Farmer' : 'مزارع') : locale === 'en' ? 'Supplier' : 'مورد'}
                     </p>
                   </div>
                 </button>
               </>
             ) : (
               <Link to="/login" className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
-                تسجيل الدخول
+                {t('nav.login')}
               </Link>
             )}
           </div>
@@ -185,8 +176,12 @@ export function ProductsPage() {
 
       <div className="bg-gradient-to-b from-emerald-50 dark:from-emerald-900/20 to-white dark:to-gray-900 py-12">
         <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold text-emerald-900 dark:text-emerald-400 mb-4">تصفح المنتجات</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">اكتشف أفضل المنتجات الزراعية الطازجة من مزارعنا</p>
+          <h1 className="text-4xl font-bold text-emerald-900 dark:text-emerald-400 mb-4">
+            {locale === 'en' ? 'Browse products' : 'تصفح المنتجات'}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            {locale === 'en' ? 'Discover fresh local produce from our farms' : 'اكتشف أفضل المنتجات الزراعية الطازجة من مزارعنا'}
+          </p>
 
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
             <div className="flex gap-4 mb-4">
@@ -196,7 +191,7 @@ export function ProductsPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ابحث عن المنتجات أو المزارعين..."
+                  placeholder={locale === 'en' ? 'Search products or farms...' : 'ابحث عن المنتجات أو المزارعين...'}
                   className="w-full pr-12 pl-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -206,10 +201,10 @@ export function ProductsPage() {
                 onChange={(e) => setPriceRange(e.target.value)}
                 className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="all">جميع الأسعار</option>
-                <option value="low">أقل من 20 ر.س</option>
-                <option value="medium">20 - 100 ر.س</option>
-                <option value="high">أكثر من 100 ر.س</option>
+                <option value="all">{locale === 'en' ? 'All prices' : 'جميع الأسعار'}</option>
+                <option value="low">{locale === 'en' ? 'Under 20 SAR' : 'أقل من 20 ر.س'}</option>
+                <option value="medium">{locale === 'en' ? '20 - 100 SAR' : '20 - 100 ر.س'}</option>
+                <option value="high">{locale === 'en' ? 'Over 100 SAR' : 'أكثر من 100 ر.س'}</option>
               </select>
             </div>
 
@@ -237,13 +232,21 @@ export function ProductsPage() {
       <div className="container mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <p className="text-gray-600 dark:text-gray-400">
-            عرض <span className="font-semibold text-gray-900 dark:text-white">{filteredListings.length}</span> منتج
+            {locale === 'en' ? (
+              <>
+                Showing <span className="font-semibold text-gray-900 dark:text-white">{filteredListings.length}</span> products
+              </>
+            ) : (
+              <>
+                عرض <span className="font-semibold text-gray-900 dark:text-white">{filteredListings.length}</span> منتج
+              </>
+            )}
           </p>
           <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-            <option>الأحدث</option>
-            <option>الأعلى تقييماً</option>
-            <option>الأقل سعراً</option>
-            <option>الأعلى سعراً</option>
+            <option>{locale === 'en' ? 'Newest' : 'الأحدث'}</option>
+            <option>{locale === 'en' ? 'Top rated' : 'الأعلى تقييماً'}</option>
+            <option>{locale === 'en' ? 'Lowest price' : 'الأقل سعراً'}</option>
+            <option>{locale === 'en' ? 'Highest price' : 'الأعلى سعراً'}</option>
           </select>
         </div>
 
@@ -254,7 +257,9 @@ export function ProductsPage() {
         )}
 
         {isLoading ? (
-          <div className="py-16 text-center text-gray-500 dark:text-gray-400">جارٍ تحميل المنتجات...</div>
+          <div className="py-16 text-center text-gray-500 dark:text-gray-400">
+            {locale === 'en' ? 'Loading products…' : 'جارٍ تحميل المنتجات...'}
+          </div>
         ) : (
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredListings.map((listing) => (
