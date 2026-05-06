@@ -3,10 +3,13 @@ import { ThumairLogo } from '../components/ThumairLogo';
 import { LogIn, Eye, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
+import { bi } from '../i18n/bilingual';
 
 export function WelcomePage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { locale } = useLocale();
 
   useEffect(() => {
     if (isAuthenticated) navigate('/home', { replace: true });
@@ -34,13 +37,13 @@ export function WelcomePage() {
           {/* Title with Animation */}
           <div className="mb-12 animate-fade-in-up">
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-2xl">
-              مرحباً بك في ثمير
+              {bi(locale, 'مرحباً بك في ثمير', 'Welcome to Thumair')}
             </h1>
             <p className="text-2xl md:text-3xl text-emerald-300 font-semibold mb-4">
-              ربط .. تمكين .. استدامة
+              {bi(locale, 'ربط .. تمكين .. استدامة', 'Connect · Empower · Sustain')}
             </p>
             <p className="text-xl text-sky-100 max-w-2xl mx-auto leading-relaxed">
-              المنصة الرقمية السعودية الرائدة للتسويق الزراعي
+              {bi(locale, 'المنصة الرقمية السعودية الرائدة للتسويق الزراعي', "Saudi Arabia's leading digital agricultural marketplace")}
             </p>
           </div>
 
@@ -51,7 +54,7 @@ export function WelcomePage() {
               className="group w-full sm:w-auto px-10 py-5 bg-white text-sky-900 rounded-2xl hover:bg-emerald-50 transition-all duration-300 font-bold text-xl shadow-2xl hover:shadow-emerald-500/50 hover:scale-105 flex items-center justify-center gap-3"
             >
               <LogIn className="size-6 group-hover:rotate-12 transition-transform" />
-              تسجيل الدخول
+              {bi(locale, 'تسجيل الدخول', 'Log in')}
             </Link>
 
             <Link
@@ -59,7 +62,7 @@ export function WelcomePage() {
               className="group w-full sm:w-auto px-10 py-5 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition-all duration-300 font-bold text-xl shadow-2xl hover:shadow-emerald-500/50 hover:scale-105 flex items-center justify-center gap-3"
             >
               <Eye className="size-6 group-hover:scale-110 transition-transform" />
-              التصفح كضيف
+              {bi(locale, 'التصفح كضيف', 'Browse as guest')}
             </Link>
           </div>
 
@@ -68,19 +71,19 @@ export function WelcomePage() {
             <div className="px-6 py-3 bg-white/10 backdrop-blur-md rounded-full text-white border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
               <span className="flex items-center gap-2">
                 <Sparkles className="size-4 text-emerald-400" />
-                <span className="font-semibold">500+ مزارع نشط</span>
+                <span className="font-semibold">{bi(locale, '500+ مزارع نشط', '500+ active farms')}</span>
               </span>
             </div>
             <div className="px-6 py-3 bg-white/10 backdrop-blur-md rounded-full text-white border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
               <span className="flex items-center gap-2">
                 <Sparkles className="size-4 text-emerald-400" />
-                <span className="font-semibold">1000+ منتج متنوع</span>
+                <span className="font-semibold">{bi(locale, '1000+ منتج متنوع', '1000+ diverse products')}</span>
               </span>
             </div>
             <div className="px-6 py-3 bg-white/10 backdrop-blur-md rounded-full text-white border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
               <span className="flex items-center gap-2">
                 <Sparkles className="size-4 text-emerald-400" />
-                <span className="font-semibold">98% رضا العملاء</span>
+                <span className="font-semibold">{bi(locale, '98% رضا العملاء', '98% customer satisfaction')}</span>
               </span>
             </div>
           </div>

@@ -20,6 +20,16 @@
         } catch (_) {}
       })();
     </script>
+    <script>
+      (function () {
+        try {
+          var locale = localStorage.getItem('locale');
+          if (locale !== 'en') locale = 'ar';
+          document.documentElement.lang = locale;
+          document.documentElement.dir = locale === 'en' ? 'ltr' : 'rtl';
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

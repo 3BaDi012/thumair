@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
+import { bi } from '../i18n/bilingual';
 
 interface Props {
   onClick: () => void;
@@ -10,6 +12,7 @@ interface Props {
 
 export function NotificationBell({ onClick, className }: Props) {
   const { supabaseUser } = useAuth();
+  const { locale } = useLocale();
   const [unread, setUnread] = useState(0);
 
   useEffect(() => {
@@ -49,7 +52,7 @@ export function NotificationBell({ onClick, className }: Props) {
     <button
       onClick={onClick}
       className={`relative p-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition ${className ?? ''}`}
-      aria-label="الإشعارات"
+      aria-label={bi(locale, 'الإشعارات', 'Notifications')}
     >
       <Bell className="size-6" />
       {unread > 0 && (

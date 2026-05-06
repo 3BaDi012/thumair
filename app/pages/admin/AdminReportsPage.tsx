@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type ReportRow = {
   id: string;
@@ -15,6 +17,7 @@ type ReportRow = {
 const STATUSES: ReportRow['status'][] = ['open', 'reviewing', 'resolved', 'rejected'];
 
 export function AdminReportsPage() {
+  const { locale } = useLocale();
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,8 +48,10 @@ export function AdminReportsPage() {
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">البلاغات</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">مراجعة البلاغات على الإعلانات والرسائل.</p>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{bi(locale, 'البلاغات', 'Reports')}</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        {bi(locale, 'مراجعة البلاغات على الإعلانات والرسائل.', 'Review reports on listings and messages.')}
+      </p>
 
       <div className="flex gap-2 mb-4">
         {(['all', ...STATUSES] as const).map((s) => (
@@ -57,7 +62,7 @@ export function AdminReportsPage() {
               filter === s ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
-            {s === 'all' ? 'الكل' : s}
+            {s === 'all' ? bi(locale, 'الكل', 'All') : s}
           </button>
         ))}
       </div>
@@ -68,18 +73,18 @@ export function AdminReportsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300">
             <tr>
-              <th className="p-3 text-right">السبب</th>
-              <th className="p-3 text-right">المرفقات</th>
-              <th className="p-3 text-right">الحالة</th>
-              <th className="p-3 text-right">التاريخ</th>
-              <th className="p-3 text-right">إجراءات</th>
+              <th className="p-3 text-right">{bi(locale, 'السبب', 'Reason')}</th>
+              <th className="p-3 text-right">{bi(locale, 'المرفقات', 'Refs')}</th>
+              <th className="p-3 text-right">{bi(locale, 'الحالة', 'Status')}</th>
+              <th className="p-3 text-right">{bi(locale, 'التاريخ', 'Date')}</th>
+              <th className="p-3 text-right">{bi(locale, 'إجراءات', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>جارٍ التحميل...</td></tr>
+              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>{bi(locale, 'جارٍ التحميل...', 'Loading...')}</td></tr>
             ) : reports.length === 0 ? (
-              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>لا توجد بلاغات</td></tr>
+              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>{bi(locale, 'لا توجد بلاغات', 'No reports')}</td></tr>
             ) : (
               reports.map((r) => (
                 <tr key={r.id} className="border-t border-gray-100 dark:border-gray-700">
@@ -88,12 +93,12 @@ export function AdminReportsPage() {
                     {r.details && <p className="text-xs text-gray-500 mt-1 max-w-md">{r.details}</p>}
                   </td>
                   <td className="p-3 text-xs text-gray-500 align-top">
-                    {r.listing_id && <p>إعلان: {r.listing_id.slice(0, 8)}…</p>}
-                    {r.message_id && <p>رسالة: {r.message_id.slice(0, 8)}…</p>}
+                    {r.listing_id && <p>{bi(locale, 'إعلان:', 'Listing:')} {r.listing_id.slice(0, 8)}…</p>}
+                    {r.message_id && <p>{bi(locale, 'رسالة:', 'Message:')} {r.message_id.slice(0, 8)}…</p>}
                   </td>
                   <td className="p-3 align-top"><StatusBadge status={r.status} /></td>
                   <td className="p-3 text-gray-600 dark:text-gray-400 align-top">
-                    {new Date(r.created_at).toLocaleDateString('ar-SA')}
+                    {new Date(r.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'ar-SA')}
                   </td>
                   <td className="p-3 align-top">
                     <select

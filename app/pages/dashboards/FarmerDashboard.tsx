@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Plus, Package, Eye, Edit, Trash2, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabaseClient';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 export function FarmerDashboard() {
   const navigate = useNavigate();
+  const { locale } = useLocale();
   type ListingRow = {
     id: string;
     title: string;
@@ -73,10 +76,10 @@ export function FarmerDashboard() {
     const total = listings.length;
     const published = listings.filter((l) => l.status === 'published').length;
     return [
-      { label: 'إجمالي المنتجات', value: String(total), icon: Package, color: 'bg-blue-500' },
-      { label: 'المنشور', value: String(published), icon: Eye, color: 'bg-emerald-500' },
-      { label: 'المسودات', value: String(total - published), icon: Edit, color: 'bg-amber-500' },
-      { label: 'الرسائل الأخيرة', value: String(latestMessages.length), icon: MessageSquare, color: 'bg-purple-500' },
+      { label: bi(locale, 'إجمالي المنتجات', 'Total listings'), value: String(total), icon: Package, color: 'bg-blue-500' },
+      { label: bi(locale, 'المنشور', 'Published'), value: String(published), icon: Eye, color: 'bg-emerald-500' },
+      { label: bi(locale, 'المسودات', 'Drafts'), value: String(total - published), icon: Edit, color: 'bg-amber-500' },
+      { label: bi(locale, 'الرسائل الأخيرة', 'Latest messages'), value: String(latestMessages.length), icon: MessageSquare, color: 'bg-purple-500' },
     ];
   }, [latestMessages.length, listings]);
 
@@ -84,15 +87,15 @@ export function FarmerDashboard() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">لوحة التحكم</h1>
-          <p className="text-gray-600 mt-1">مرحباً بك في حسابك</p>
+          <h1 className="text-3xl font-bold text-gray-900">{bi(locale, 'لوحة التحكم', 'Dashboard')}</h1>
+          <p className="text-gray-600 mt-1">{bi(locale, 'مرحباً بك في حسابك', 'Welcome to your account')}</p>
         </div>
         <button
           onClick={() => navigate('/dashboard/listings/new')}
           className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
         >
           <Plus className="size-5" />
-          <span>إضافة منتج جديد</span>
+          <span>{bi(locale, 'إضافة منتج جديد', 'Add new listing')}</span>
         </button>
       </div>
 
@@ -113,7 +116,7 @@ export function FarmerDashboard() {
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">منتجاتي</h2>
+            <h2 className="text-xl font-bold text-gray-900">{bi(locale, 'منتجاتي', 'My listings')}</h2>
           </div>
           <div className="p-6">
             <div className="space-y-4">
@@ -151,7 +154,7 @@ export function FarmerDashboard() {
                 </div>
               ))}
               {listings.length === 0 && !error && (
-                <div className="text-sm text-gray-600">لا توجد منتجات بعد. اضغط “إضافة منتج جديد”.</div>
+                <div className="text-sm text-gray-600">{bi(locale, 'لا توجد منتجات بعد. اضغط “إضافة منتج جديد”.', 'No listings yet. Click “Add new listing”.')}</div>
               )}
             </div>
           </div>
@@ -159,18 +162,18 @@ export function FarmerDashboard() {
 
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">الرسائل الأخيرة</h2>
+            <h2 className="text-xl font-bold text-gray-900">{bi(locale, 'الرسائل الأخيرة', 'Latest messages')}</h2>
           </div>
           <div className="p-6">
             <div className="space-y-4">
               {latestMessages.map((m) => (
                 <div key={m.id} className="p-4 border border-gray-200 rounded-lg">
                   <p className="text-sm text-gray-600 line-clamp-2">{m.body}</p>
-                  <p className="text-xs text-gray-500 mt-2">{new Date(m.created_at).toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 mt-2">{new Date(m.created_at).toLocaleString(locale === 'en' ? 'en-US' : 'ar-SA')}</p>
                 </div>
               ))}
               {latestMessages.length === 0 && (
-                <div className="text-sm text-gray-600">لا توجد رسائل بعد.</div>
+                <div className="text-sm text-gray-600">{bi(locale, 'لا توجد رسائل بعد.', 'No messages yet.')}</div>
               )}
             </div>
           </div>

@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useT } from '../i18n/useT';
 import { dashboardPathForUser } from '../lib/dashboardPath';
 import { supabase } from '../lib/supabaseClient';
+import { bi } from '../i18n/bilingual';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export function LoginPage() {
 
       navigate(dashboardPathForUser(refreshed), { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'حدث خطأ أثناء تسجيل الدخول');
+      setError(err instanceof Error ? err.message : t('auth.loginError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -67,7 +68,7 @@ export function LoginPage() {
             {t('auth.login')}
           </h1>
           <p className="text-gray-600 mt-2">
-            {locale === 'en' ? 'Welcome back to Thumair' : 'مرحباً بك مجدداً في منصة ثمير'}
+            {bi(locale, 'مرحباً بك مجدداً في منصة ثمير', 'Welcome back to Thumair')}
           </p>
         </div>
 
@@ -75,10 +76,10 @@ export function LoginPage() {
           {step === 1 ? (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center" style={{ color: '#0C4A6E' }}>
-                {locale === 'en' ? 'Choose account type' : 'اختر نوع الحساب'}
+                {bi(locale, 'اختر نوع الحساب', 'Choose account type')}
               </h2>
               <p className="text-gray-600 text-center mb-8">
-                {locale === 'en' ? 'How would you like to log in?' : 'كيف تريد تسجيل الدخول؟'}
+                {bi(locale, 'كيف تريد تسجيل الدخول؟', 'How would you like to log in?')}
               </p>
 
               <div className="grid gap-6">
@@ -90,10 +91,10 @@ export function LoginPage() {
                     <ShoppingCart className="size-8" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {locale === 'en' ? 'Buyer' : 'مشتري'}
+                    {bi(locale, 'مشتري', 'Buyer')}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    {locale === 'en' ? 'Log in to buy products' : 'تسجيل الدخول كمشتري للمنتجات'}
+                    {bi(locale, 'تسجيل الدخول كمشتري للمنتجات', 'Log in to buy products')}
                   </p>
                 </button>
 
@@ -105,19 +106,19 @@ export function LoginPage() {
                     <Store className="size-8" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {locale === 'en' ? 'Farmer / Seller' : 'تاجر / مزارع'}
+                    {bi(locale, 'تاجر / مزارع', 'Farmer / Seller')}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    {locale === 'en' ? 'Log in to manage your listings' : 'تسجيل الدخول لإدارة منتجاتك'}
+                    {bi(locale, 'تسجيل الدخول لإدارة منتجاتك', 'Log in to manage your listings')}
                   </p>
                 </button>
               </div>
 
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
-                  {locale === 'en' ? "Don't have an account?" : 'ليس لديك حساب؟'}{' '}
+                  {bi(locale, 'ليس لديك حساب؟', "Don't have an account?")}{' '}
                   <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-semibold">
-                    {locale === 'en' ? 'Create a new account' : 'إنشاء حساب جديد'}
+                    {bi(locale, 'إنشاء حساب جديد', 'Create a new account')}
                   </Link>
                 </p>
               </div>
@@ -128,7 +129,7 @@ export function LoginPage() {
                 onClick={() => setStep(1)}
                 className="text-sky-600 hover:text-sky-700 mb-6 flex items-center gap-2 text-sm font-semibold"
               >
-                {locale === 'en' ? '← Back' : '← العودة'}
+                {bi(locale, '← العودة', '← Back')}
               </button>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -173,7 +174,11 @@ export function LoginPage() {
                       type="button"
                       onClick={() => setShowPassword((p) => !p)}
                       className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700"
-                      aria-label={showPassword ? (locale === 'en' ? 'Hide password' : 'إخفاء كلمة المرور') : locale === 'en' ? 'Show password' : 'إظهار كلمة المرور'}
+                      aria-label={
+                        showPassword
+                          ? bi(locale, 'إخفاء كلمة المرور', 'Hide password')
+                          : bi(locale, 'إظهار كلمة المرور', 'Show password')
+                      }
                     >
                       {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                     </button>
@@ -183,10 +188,10 @@ export function LoginPage() {
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2">
                     <input type="checkbox" className="size-4 text-emerald-600 rounded" />
-                    <span className="text-sm text-gray-600">تذكرني</span>
+            <span className="text-sm text-gray-600">{t('auth.rememberMe')}</span>
                   </label>
                   <a href="#" className="text-sm text-sky-600 hover:text-sky-700">
-                    نسيت كلمة المرور؟
+            {t('auth.forgotPassword')}
                   </a>
                 </div>
 
@@ -196,7 +201,7 @@ export function LoginPage() {
                   className="w-full py-3 text-white rounded-lg hover:opacity-90 transition-all duration-300 font-semibold shadow-lg hover:scale-105"
                   style={{ background: 'linear-gradient(135deg, #0C4A6E 0%, #10B981 100%)' }}
                 >
-                  {isSubmitting ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
+        {isSubmitting ? t('auth.loggingIn') : t('auth.login')}
                 </button>
               </form>
             </div>

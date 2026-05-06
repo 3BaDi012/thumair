@@ -5,6 +5,7 @@ import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { useAuth } from '../context/AuthContext';
 import { useT } from '../i18n/useT';
 import { dashboardPathForUser } from '../lib/dashboardPath';
+import { bi } from '../i18n/bilingual';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export function RegisterPage() {
     setError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setError('كلمتا المرور غير متطابقتين');
+      setError(t('auth.passwordsDoNotMatch'));
       return;
     }
 
@@ -55,7 +56,7 @@ export function RegisterPage() {
       const refreshed = await refreshProfile();
       navigate(dashboardPathForUser(refreshed), { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'حدث خطأ أثناء إنشاء الحساب');
+      setError(err instanceof Error ? err.message : t('auth.signupError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,10 +70,10 @@ export function RegisterPage() {
             <ThumairLogoWithText />
           </Link>
           <h1 className="text-3xl font-bold mt-4" style={{ color: '#0C4A6E' }}>
-            {locale === 'en' ? 'Create a new account' : 'إنشاء حساب جديد'}
+            {bi(locale, 'إنشاء حساب جديد', 'Create a new account')}
           </h1>
           <p className="text-gray-600 mt-2">
-            {locale === 'en' ? 'Join Thumair marketplace' : 'انضم إلى منصة ثمير الزراعية'}
+            {bi(locale, 'انضم إلى منصة ثمير الزراعية', 'Join Thumair marketplace')}
           </p>
         </div>
 
@@ -80,10 +81,10 @@ export function RegisterPage() {
           {step === 1 && (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center" style={{ color: '#0C4A6E' }}>
-                {locale === 'en' ? 'Choose account type' : 'اختر نوع الحساب'}
+                {bi(locale, 'اختر نوع الحساب', 'Choose account type')}
               </h2>
               <p className="text-gray-600 text-center mb-8">
-                {locale === 'en' ? 'Choose the type that fits you' : 'اختر النوع الذي يناسبك للاستمتاع بتجربة ثمير'}
+                {bi(locale, 'اختر النوع الذي يناسبك للاستمتاع بتجربة ثمير', 'Choose the type that fits you')}
               </p>
 
               <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -95,15 +96,13 @@ export function RegisterPage() {
                     <ShoppingCart className="size-12" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    {locale === 'en' ? 'Buyer' : 'مشتري'}
+                    {bi(locale, 'مشتري', 'Buyer')}
                   </h3>
                   <p className="text-gray-600 leading-relaxed">
-                    {locale === 'en'
-                      ? 'I want to buy fresh produce directly from farms'
-                      : 'أنا مهتم بشراء المنتجات الزراعية الطازجة مباشرة من المزارعين'}
+                    {bi(locale, 'أنا مهتم بشراء المنتجات الزراعية الطازجة مباشرة من المزارعين', 'I want to buy fresh produce directly from farms')}
                   </p>
                   <div className="mt-4 inline-flex items-center gap-2 text-sky-600 font-semibold">
-                    {locale === 'en' ? 'Choose' : 'اختر هذا الخيار'}
+                    {bi(locale, 'اختر هذا الخيار', 'Choose')}
                     <svg className="size-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
@@ -118,15 +117,13 @@ export function RegisterPage() {
                     <Store className="size-12" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    {locale === 'en' ? 'Farmer / Seller' : 'تاجر / مزارع'}
+                    {bi(locale, 'تاجر / مزارع', 'Farmer / Seller')}
                   </h3>
                   <p className="text-gray-600 leading-relaxed">
-                    {locale === 'en'
-                      ? 'I want to sell products and manage my listings'
-                      : 'أنا أملك مزرعة أو أبيع منتجات زراعية وأريد عرضها على المنصة'}
+                    {bi(locale, 'أنا أملك مزرعة أو أبيع منتجات زراعية وأريد عرضها على المنصة', 'I want to sell products and manage my listings')}
                   </p>
                   <div className="mt-4 inline-flex items-center gap-2 text-emerald-600 font-semibold">
-                    {locale === 'en' ? 'Choose' : 'اختر هذا الخيار'}
+                    {bi(locale, 'اختر هذا الخيار', 'Choose')}
                     <svg className="size-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
@@ -136,7 +133,7 @@ export function RegisterPage() {
 
               <div className="mt-8 text-center">
                 <p className="text-gray-600">
-                  {locale === 'en' ? 'Already have an account?' : 'لديك حساب بالفعل؟'}{' '}
+                  {bi(locale, 'لديك حساب بالفعل؟', 'Already have an account?')}{' '}
                   <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold">
                     {t('auth.login')}
                   </Link>
@@ -151,7 +148,7 @@ export function RegisterPage() {
                 onClick={() => setStep(1)}
                 className="text-emerald-600 hover:text-emerald-700 mb-6 flex items-center gap-2"
               >
-                ← العودة
+                {bi(locale, '← العودة', '← Back')}
               </button>
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -163,7 +160,7 @@ export function RegisterPage() {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      الاسم الكامل
+                      {bi(locale, 'الاسم الكامل', 'Full name')}
                     </label>
                     <div className="relative">
                       <User className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -173,14 +170,14 @@ export function RegisterPage() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                        placeholder="أحمد محمد"
+                        placeholder={bi(locale, 'أحمد محمد', 'Ahmed Mohammed')}
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      رقم الجوال
+                      {bi(locale, 'رقم الجوال', 'Phone number')}
                     </label>
                     <div className="relative">
                       <Phone className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -198,7 +195,7 @@ export function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    البريد الإلكتروني
+                    {bi(locale, 'البريد الإلكتروني', 'Email')}
                   </label>
                   <div className="relative">
                     <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -215,7 +212,7 @@ export function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    الموقع
+                    {bi(locale, 'الموقع', 'Location')}
                   </label>
                   <div className="relative">
                     <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -225,7 +222,7 @@ export function RegisterPage() {
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       className="w-full pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                      placeholder="المدينة، المنطقة"
+                      placeholder={bi(locale, 'المدينة، المنطقة', 'City, region')}
                     />
                   </div>
                 </div>
@@ -233,7 +230,7 @@ export function RegisterPage() {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      كلمة المرور
+                      {bi(locale, 'كلمة المرور', 'Password')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -251,7 +248,7 @@ export function RegisterPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      تأكيد كلمة المرور
+                      {bi(locale, 'تأكيد كلمة المرور', 'Confirm password')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -271,13 +268,13 @@ export function RegisterPage() {
                 <div className="flex items-start gap-3">
                   <input type="checkbox" required className="mt-1 size-4 text-emerald-600 rounded" />
                   <p className="text-sm text-gray-600">
-                    أوافق على{' '}
+                    {bi(locale, 'أوافق على', 'I agree to')}{' '}
                     <a href="#" className="text-emerald-600 hover:text-emerald-700">
-                      الشروط والأحكام
+                      {bi(locale, 'الشروط والأحكام', 'Terms & Conditions')}
                     </a>{' '}
-                    و{' '}
+                    {bi(locale, 'و', 'and')}{' '}
                     <a href="#" className="text-emerald-600 hover:text-emerald-700">
-                      سياسة الخصوصية
+                      {bi(locale, 'سياسة الخصوصية', 'Privacy Policy')}
                     </a>
                   </p>
                 </div>
@@ -288,15 +285,15 @@ export function RegisterPage() {
                   className="w-full py-3 text-white rounded-lg hover:opacity-90 transition font-semibold shadow-lg"
                   style={{ background: 'linear-gradient(135deg, #0C4A6E 0%, #10B981 100%)' }}
                 >
-                  {isSubmitting ? 'جارٍ إنشاء الحساب...' : 'إنشاء الحساب'}
+                  {isSubmitting ? t('auth.creatingAccount') : t('auth.signup')}
                 </button>
               </form>
 
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
-                  لديك حساب بالفعل؟{' '}
+                  {bi(locale, 'لديك حساب بالفعل؟', 'Already have an account?')}{' '}
                   <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold">
-                    تسجيل الدخول
+                    {bi(locale, 'تسجيل الدخول', 'Log in')}
                   </Link>
                 </p>
               </div>

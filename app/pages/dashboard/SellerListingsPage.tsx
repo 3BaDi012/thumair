@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type ListingRow = {
   id: string;
@@ -13,6 +15,7 @@ type ListingRow = {
 
 export function SellerListingsPage() {
   const { supabaseUser } = useAuth();
+  const { locale } = useLocale();
   const [listings, setListings] = useState<ListingRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,14 +72,16 @@ export function SellerListingsPage() {
       <div className="container mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">إعلاناتي</h1>
-            <p className="text-gray-600 dark:text-gray-400">إدارة إعلانات مزرعتك (مسودة/منشور).</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{bi(locale, 'إعلاناتي', 'My listings')}</h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              {bi(locale, 'إدارة إعلانات مزرعتك (مسودة/منشور).', 'Manage your listings (draft/published).')}
+            </p>
           </div>
           <Link
             to="/dashboard/listings/new"
             className="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition"
           >
-            إضافة إعلان
+            {bi(locale, 'إضافة إعلان', 'New listing')}
           </Link>
         </div>
 
@@ -86,26 +91,26 @@ export function SellerListingsPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300">
               <tr>
-                <th className="p-3 text-right">العنوان</th>
-                <th className="p-3 text-right">الحالة</th>
-                <th className="p-3 text-right">تاريخ الإنشاء</th>
-                <th className="p-3 text-right">إجراءات</th>
+                <th className="p-3 text-right">{bi(locale, 'العنوان', 'Title')}</th>
+                <th className="p-3 text-right">{bi(locale, 'الحالة', 'Status')}</th>
+                <th className="p-3 text-right">{bi(locale, 'تاريخ الإنشاء', 'Created')}</th>
+                <th className="p-3 text-right">{bi(locale, 'إجراءات', 'Actions')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td className="p-6 text-center text-gray-500" colSpan={4}>جارٍ التحميل...</td></tr>
+                <tr><td className="p-6 text-center text-gray-500" colSpan={4}>{bi(locale, 'جارٍ التحميل...', 'Loading...')}</td></tr>
               ) : listings.length === 0 ? (
-                <tr><td className="p-6 text-center text-gray-500 dark:text-gray-400" colSpan={4}>لا توجد إعلانات بعد</td></tr>
+                <tr><td className="p-6 text-center text-gray-500 dark:text-gray-400" colSpan={4}>{bi(locale, 'لا توجد إعلانات بعد', 'No listings yet')}</td></tr>
               ) : (
                 listings.map((l) => (
                   <tr key={l.id} className="border-t border-gray-100 dark:border-gray-700">
                     <td className="p-3">{l.title}</td>
                     <td className="p-3">{l.status}</td>
-                    <td className="p-3">{new Date(l.created_at).toLocaleString('ar-SA')}</td>
+                    <td className="p-3">{new Date(l.created_at).toLocaleString(locale === 'en' ? 'en-US' : 'ar-SA')}</td>
                     <td className="p-3">
                       <Link to={`/dashboard/listings/${l.id}/edit`} className="text-emerald-700 dark:text-emerald-300 hover:underline">
-                        تعديل
+                        {bi(locale, 'تعديل', 'Edit')}
                       </Link>
                     </td>
                   </tr>

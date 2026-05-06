@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Search, Trash2, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router';
 import { supabase } from '../../lib/supabaseClient';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type ListingRow = {
   id: string;
@@ -17,6 +19,7 @@ type ListingRow = {
 const STATUSES = ['all', 'draft', 'published', 'paused', 'archived', 'removed'] as const;
 
 export function AdminListingsPage() {
+  const { locale } = useLocale();
   const [listings, setListings] = useState<ListingRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +59,9 @@ export function AdminListingsPage() {
   async function confirmRemove() {
     if (!removeTarget) return;
     if (reason.trim().length < 3) {
-      setError('يرجى كتابة سبب واضح للحذف (3 أحرف على الأقل).');
+      setError(
+        bi(locale, 'يرجى كتابة سبب واضح للحذف (3 أحرف على الأقل).', 'Please provide a clear removal reason (at least 3 characters).')
+      );
       return;
     }
     setRemoving(true);
@@ -72,7 +77,7 @@ export function AdminListingsPage() {
       setReason('');
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'تعذر حذف الإعلان');
+      setError(e instanceof Error ? e.message : bi(locale, 'تعذر حذف الإعلان', "Couldn't remove listing"));
     } finally {
       setRemoving(false);
     }
@@ -80,8 +85,10 @@ export function AdminListingsPage() {
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">الإعلانات</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">مراجعة الإعلانات وحذفها مع إشعار صاحب المزرعة بالسبب.</p>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{bi(locale, 'الإعلانات', 'Listings')}</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        {bi(locale, 'مراجعة الإعلانات وحذفها مع إشعار صاحب المزرعة بالسبب.', 'Review listings and remove them while notifying the owner with a reason.')}
+      </p>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
@@ -89,7 +96,7 @@ export function AdminListingsPage() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="ابحث بالعنوان أو اسم المزرعة..."
+            placeholder={bi(locale, 'ابحث بالعنوان أو اسم المزرعة...', 'Search by title or farm name...')}
             className="w-full pr-10 pl-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
           />
         </div>
@@ -100,7 +107,7 @@ export function AdminListingsPage() {
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>
-              {s === 'all' ? 'كل الحالات' : s}
+              {s === 'all' ? bi(locale, 'كل الحالات', 'All statuses') : s}
             </option>
           ))}
         </select>
@@ -112,11 +119,11 @@ export function AdminListingsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300">
             <tr>
-              <th className="p-3 text-right">العنوان</th>
-              <th className="p-3 text-right">المزرعة</th>
-              <th className="p-3 text-right">الحالة</th>
-              <th className="p-3 text-right">تاريخ الإنشاء</th>
-              <th className="p-3 text-right">إجراءات</th>
+              <th className="p-3 text-right">{bi(locale, 'العنوان', 'Title')}</th>
+              <th className="p-3 text-right">{bi(locale, 'المزرعة', 'Farm')}</th>
+              <th className="p-3 text-right">{bi(locale, 'الحالة', 'Status')}</th>
+              <th className="p-3 text-right">{bi(locale, 'تاريخ الإنشاء', 'Created')}</th>
+              <th className="p-3 text-right">{bi(locale, 'إجراءات', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>

@@ -9,6 +9,9 @@ import { NotificationsSidebar } from '../components/NotificationsSidebar';
 import { supabase } from '../lib/supabaseClient';
 import { userFacingFunctionError } from '../lib/functionUserFacingError';
 import { NotificationBell } from '../components/NotificationBell';
+import { useLocale } from '../context/LocaleContext';
+import { bi } from '../i18n/bilingual';
+import { categoryLabel } from '../lib/categories';
 
 type ListingDetail = {
   id: string;
@@ -35,6 +38,7 @@ export function ProductDetailPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { locale } = useLocale();
 
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [ratings, setRatings] = useState<RatingRow[]>([]);
@@ -89,7 +93,7 @@ export function ProductDetailPage() {
         return;
       }
       if (!listingData) {
-        setError('الإعلان غير موجود.');
+        setError(bi(locale, 'الإعلان غير موجود.', 'Listing not found.'));
         setLoading(false);
         return;
       }
@@ -107,7 +111,7 @@ export function ProductDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500">جارٍ تحميل المنتج...</p>
+        <p className="text-gray-500">{bi(locale, 'جارٍ تحميل المنتج...', 'Loading product...')}</p>
       </div>
     );
   }
@@ -116,8 +120,12 @@ export function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{error ?? 'تعذر تحميل المنتج'}</h1>
-          <Link to="/products" className="text-emerald-600 hover:text-emerald-700">العودة للمنتجات</Link>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {error ?? bi(locale, 'تعذر تحميل المنتج', 'Failed to load product')}
+          </h1>
+          <Link to="/products" className="text-emerald-600 hover:text-emerald-700">
+            {bi(locale, 'العودة للمنتجات', 'Back to products')}
+          </Link>
         </div>
       </div>
     );
@@ -151,7 +159,7 @@ export function ProductDetailPage() {
       return;
     }
     if (!Number.isFinite(quantity) || quantity <= 0) {
-      setOrderResult('أدخل كمية صحيحة.');
+      setOrderResult(bi(locale, 'أدخل كمية صحيحة.', 'Enter a valid quantity.'));
       return;
     }
     setOrderSubmitting(true);
@@ -166,10 +174,10 @@ export function ProductDetailPage() {
         notes: orderNotes || null,
       });
       if (insErr) throw insErr;
-      setOrderResult('تم إرسال طلبك! سيتواصل معك البائع.');
+      setOrderResult(bi(locale, 'تم إرسال طلبك! سيتواصل معك البائع.', 'Your order was sent! The seller will contact you.'));
       setOrderNotes('');
     } catch (e) {
-      setOrderResult(e instanceof Error ? e.message : 'تعذر إرسال الطلب');
+      setOrderResult(e instanceof Error ? e.message : bi(locale, 'تعذر إرسال الطلب', "Couldn't send the order"));
     } finally {
       setOrderSubmitting(false);
     }
@@ -200,7 +208,7 @@ export function ProductDetailPage() {
       setMyComment('');
       setMyRating(0);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'تعذر حفظ التقييم');
+      setError(e instanceof Error ? e.message : bi(locale, 'تعذر حفظ التقييم', "Couldn't save rating"));
     } finally {
       setRatingSubmitting(false);
     }
@@ -214,26 +222,32 @@ export function ProductDetailPage() {
             <ThumairLogoWithText />
           </Link>
           <div className="flex items-center gap-4">
-            <Link to="/products" className="text-gray-600 hover:text-emerald-600 transition">المنتجات</Link>
+            <Link to="/products" className="text-gray-600 hover:text-emerald-600 transition">
+              {bi(locale, 'المنتجات', 'Products')}
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link
                   to={user?.userType === 'farmer' ? '/dashboard/farmer' : '/dashboard/buyer'}
                   className="text-gray-600 hover:text-emerald-600 transition"
                 >
-                  لوحة التحكم
+                  {bi(locale, 'لوحة التحكم', 'Dashboard')}
                 </Link>
                 <NotificationBell onClick={() => setIsNotificationsOpen(true)} />
                 <button onClick={() => setIsProfileOpen(true)} className="flex items-center gap-3 hover:bg-gray-50 rounded-lg transition p-2">
                   <div className="size-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center"><User className="size-5" /></div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-                    <p className="text-xs text-gray-500">{user?.userType === 'farmer' ? 'مزارع' : 'مشتري'}</p>
+                    <p className="text-xs text-gray-500">
+                      {user?.userType === 'farmer' ? bi(locale, 'مزارع', 'Farmer') : bi(locale, 'مشتري', 'Buyer')}
+                    </p>
                   </div>
                 </button>
               </>
             ) : (
-              <Link to="/login" className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">تسجيل الدخول</Link>
+              <Link to="/login" className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                {bi(locale, 'تسجيل الدخول', 'Log in')}
+              </Link>
             )}
           </div>
         </div>
@@ -241,7 +255,9 @@ export function ProductDetailPage() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="mb-4">
-          <Link to="/products" className="text-emerald-600 hover:text-emerald-700 text-sm">← العودة للمنتجات</Link>
+          <Link to="/products" className="text-emerald-600 hover:text-emerald-700 text-sm">
+            {bi(locale, '← العودة للمنتجات', '← Back to products')}
+          </Link>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
@@ -274,12 +290,14 @@ export function ProductDetailPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 {listing.category && (
-                  <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-sm rounded-full mb-3">{listing.category}</span>
+                  <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-sm rounded-full mb-3">
+                    {categoryLabel(locale, listing.category)}
+                  </span>
                 )}
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">{listing.title}</h1>
                 <p className="text-gray-600 flex items-center gap-2 mb-3">
                   <User className="size-4" />
-                  {listing.organizations?.name ?? 'مزرعة'}
+                  {listing.organizations?.name ?? bi(locale, 'مزرعة', 'Farm')}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -303,10 +321,10 @@ export function ProductDetailPage() {
                 <div className="flex items-center gap-1">
                   <Star className="size-5 text-yellow-500 fill-yellow-500" />
                   <span className="text-lg font-semibold text-gray-900">{ratingAvg.toFixed(1)}</span>
-                  <span className="text-gray-500">({ratings.length} تقييم)</span>
+                  <span className="text-gray-500">({ratings.length} {bi(locale, 'تقييم', 'ratings')})</span>
                 </div>
               ) : (
-                <span className="text-sm text-gray-500">لا توجد تقييمات بعد</span>
+                <span className="text-sm text-gray-500">{bi(locale, 'لا توجد تقييمات بعد', 'No ratings yet')}</span>
               )}
               {(listing.city || listing.region) && (
                 <div className="flex items-center gap-2 text-gray-600">
@@ -319,16 +337,18 @@ export function ProductDetailPage() {
             <div className="mb-6">
               <div className="flex items-baseline gap-3 mb-2">
                 <span className="text-5xl font-bold text-emerald-600">{priceLabel ?? '—'}</span>
-                <span className="text-xl text-gray-600">{listing.currency} / {listing.unit ?? 'وحدة'}</span>
+                <span className="text-xl text-gray-600">{listing.currency} / {listing.unit ?? bi(locale, 'وحدة', 'unit')}</span>
               </div>
               {listing.available_quantity != null && (
-                <p className="text-sm text-emerald-600 font-semibold mt-1">متوفر: {listing.available_quantity} {listing.unit ?? ''}</p>
+                <p className="text-sm text-emerald-600 font-semibold mt-1">
+                  {bi(locale, 'متوفر:', 'Available:')} {listing.available_quantity} {listing.unit ?? ''}
+                </p>
               )}
             </div>
 
             {listing.description && (
               <div className="mb-6">
-                <h3 className="font-bold text-gray-900 mb-3">الوصف</h3>
+                <h3 className="font-bold text-gray-900 mb-3">{bi(locale, 'الوصف', 'Description')}</h3>
                 <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{listing.description}</p>
               </div>
             )}
@@ -337,15 +357,15 @@ export function ProductDetailPage() {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <Shield className="size-6 text-emerald-600 mx-auto mb-1" />
-                  <p className="text-xs text-gray-600">منتج موثق</p>
+                  <p className="text-xs text-gray-600">{bi(locale, 'منتج موثق', 'Verified')}</p>
                 </div>
                 <div>
                   <Package className="size-6 text-emerald-600 mx-auto mb-1" />
-                  <p className="text-xs text-gray-600">تغليف آمن</p>
+                  <p className="text-xs text-gray-600">{bi(locale, 'تغليف آمن', 'Safe packaging')}</p>
                 </div>
                 <div>
                   <TrendingUp className="size-6 text-emerald-600 mx-auto mb-1" />
-                  <p className="text-xs text-gray-600">جودة عالية</p>
+                  <p className="text-xs text-gray-600">{bi(locale, 'جودة عالية', 'High quality')}</p>
                 </div>
               </div>
             </div>
@@ -355,7 +375,7 @@ export function ProductDetailPage() {
                 onClick={() => setShowContactForm((v) => !v)}
                 className="w-full py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold text-lg"
               >
-                طلب شراء
+                {bi(locale, 'طلب شراء', 'Place an order')}
               </button>
               <button
                 onClick={async () => {
@@ -378,7 +398,7 @@ export function ProductDetailPage() {
                 }}
                 className="w-full py-4 bg-white text-emerald-600 border-2 border-emerald-600 rounded-lg hover:bg-emerald-50 transition font-semibold"
               >
-                التواصل مع البائع (محادثة)
+                {bi(locale, 'التواصل مع البائع (محادثة)', 'Message the seller')}
               </button>
               {conversationError && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{conversationError}</div>
@@ -387,9 +407,11 @@ export function ProductDetailPage() {
 
             {showContactForm && (
               <form onSubmit={submitOrder} className="mt-6 p-6 bg-white border-2 border-emerald-200 rounded-xl space-y-4">
-                <h3 className="font-bold text-gray-900">إرسال طلب شراء</h3>
+                <h3 className="font-bold text-gray-900">{bi(locale, 'إرسال طلب شراء', 'Send an order request')}</h3>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">الكمية ({listing.unit ?? 'وحدة'})</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {bi(locale, 'الكمية', 'Quantity')} ({listing.unit ?? bi(locale, 'وحدة', 'unit')})
+                  </label>
                   <input
                     type="number"
                     min={minOrder}
@@ -399,7 +421,7 @@ export function ProductDetailPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">ملاحظات</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{bi(locale, 'ملاحظات', 'Notes')}</label>
                   <textarea
                     rows={3}
                     value={orderNotes}
@@ -409,7 +431,7 @@ export function ProductDetailPage() {
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                   <div>
-                    <p className="text-sm text-gray-600">الإجمالي</p>
+                    <p className="text-sm text-gray-600">{bi(locale, 'الإجمالي', 'Total')}</p>
                     <p className="text-2xl font-bold text-emerald-600">{(quantity * (priceLabel ?? 0)).toFixed(2)} {listing.currency}</p>
                   </div>
                   <button
@@ -417,7 +439,7 @@ export function ProductDetailPage() {
                     disabled={orderSubmitting}
                     className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold disabled:opacity-50"
                   >
-                    {orderSubmitting ? 'جارٍ الإرسال...' : 'إرسال الطلب'}
+                    {orderSubmitting ? bi(locale, 'جارٍ الإرسال...', 'Sending...') : bi(locale, 'إرسال الطلب', 'Send order')}
                   </button>
                 </div>
                 {orderResult && <p className="text-sm text-emerald-700">{orderResult}</p>}
@@ -427,11 +449,13 @@ export function ProductDetailPage() {
         </div>
 
         <div className="bg-white rounded-xl p-8 shadow-sm mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">التقييمات ({ratings.length})</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {bi(locale, 'التقييمات', 'Ratings')} ({ratings.length})
+          </h2>
 
           {isAuthenticated && (
             <div className="mb-8 p-4 border border-gray-200 rounded-xl">
-              <p className="text-sm font-medium text-gray-700 mb-2">قيّم المنتج</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{bi(locale, 'قيّم المنتج', 'Rate this product')}</p>
               <div className="flex gap-1 mb-3">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button
@@ -446,7 +470,7 @@ export function ProductDetailPage() {
               <textarea
                 value={myComment}
                 onChange={(e) => setMyComment(e.target.value)}
-                placeholder="تعليق (اختياري)"
+                placeholder={bi(locale, 'تعليق (اختياري)', 'Comment (optional)')}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3"
               />
@@ -455,13 +479,13 @@ export function ProductDetailPage() {
                 disabled={ratingSubmitting || myRating === 0}
                 className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 text-sm"
               >
-                {ratingSubmitting ? 'جارٍ الحفظ...' : 'إرسال التقييم'}
+                {ratingSubmitting ? bi(locale, 'جارٍ الحفظ...', 'Saving...') : bi(locale, 'إرسال التقييم', 'Submit rating')}
               </button>
             </div>
           )}
 
           {ratings.length === 0 ? (
-            <p className="text-gray-500">لا توجد تقييمات بعد. كن أول من يقيّم!</p>
+            <p className="text-gray-500">{bi(locale, 'لا توجد تقييمات بعد. كن أول من يقيّم!', 'No ratings yet. Be the first to rate!')}</p>
           ) : (
             <div className="space-y-4">
               {ratings.map((r) => (
@@ -472,7 +496,9 @@ export function ProductDetailPage() {
                     ))}
                   </div>
                   {r.comment && <p className="text-gray-700 text-sm mb-1">{r.comment}</p>}
-                  <p className="text-xs text-gray-500">{new Date(r.created_at).toLocaleDateString('ar-SA')}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(r.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'ar-SA')}
+                  </p>
                 </div>
               ))}
             </div>

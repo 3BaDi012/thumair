@@ -1,51 +1,54 @@
 import { Plus, TrendingUp, Users, DollarSign, Star } from 'lucide-react';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 export function SupplierDashboard() {
+  const { locale } = useLocale();
   const stats = [
-    { label: 'الخدمات المعروضة', value: '8', icon: Star, color: 'bg-blue-500' },
-    { label: 'العملاء', value: '45', icon: Users, color: 'bg-green-500' },
-    { label: 'الطلبات النشطة', value: '12', icon: TrendingUp, color: 'bg-purple-500' },
-    { label: 'الإيرادات', value: '85,000 ر.س', icon: DollarSign, color: 'bg-orange-500' },
+    { label: bi(locale, 'الخدمات المعروضة', 'Services'), value: '8', icon: Star, color: 'bg-blue-500' },
+    { label: bi(locale, 'العملاء', 'Clients'), value: '45', icon: Users, color: 'bg-green-500' },
+    { label: bi(locale, 'الطلبات النشطة', 'Active requests'), value: '12', icon: TrendingUp, color: 'bg-purple-500' },
+    { label: bi(locale, 'الإيرادات', 'Revenue'), value: bi(locale, '85,000 ر.س', 'SAR 85,000'), icon: DollarSign, color: 'bg-orange-500' },
   ];
 
   const services = [
-    { id: 1, name: 'خدمات الحصاد', description: 'حصاد المحاصيل بآليات حديثة', price: '150 ر.س/ساعة', requests: 8, image: '🚜' },
-    { id: 2, name: 'نقل المنتجات', description: 'نقل وتوصيل المحاصيل للأسواق', price: '200 ر.س/رحلة', requests: 15, image: '🚛' },
-    { id: 3, name: 'الري الحديث', description: 'تركيب وصيانة أنظمة الري', price: '300 ر.س/يوم', requests: 5, image: '💧' },
-    { id: 4, name: 'الأسمدة العضوية', description: 'توريد أسمدة عضوية طبيعية', price: '50 ر.س/كيس', requests: 20, image: '🌱' },
+    { id: 1, name: bi(locale, 'خدمات الحصاد', 'Harvesting services'), description: bi(locale, 'حصاد المحاصيل بآليات حديثة', 'Modern machinery crop harvesting'), price: bi(locale, '150 ر.س/ساعة', 'SAR 150/hour'), requests: 8, image: '🚜' },
+    { id: 2, name: bi(locale, 'نقل المنتجات', 'Product transport'), description: bi(locale, 'نقل وتوصيل المحاصيل للأسواق', 'Transport and deliver crops to markets'), price: bi(locale, '200 ر.س/رحلة', 'SAR 200/trip'), requests: 15, image: '🚛' },
+    { id: 3, name: bi(locale, 'الري الحديث', 'Irrigation systems'), description: bi(locale, 'تركيب وصيانة أنظمة الري', 'Install & maintain irrigation systems'), price: bi(locale, '300 ر.س/يوم', 'SAR 300/day'), requests: 5, image: '💧' },
+    { id: 4, name: bi(locale, 'الأسمدة العضوية', 'Organic fertilizers'), description: bi(locale, 'توريد أسمدة عضوية طبيعية', 'Supply natural organic fertilizers'), price: bi(locale, '50 ر.س/كيس', 'SAR 50/bag'), requests: 20, image: '🌱' },
   ];
 
   const recentRequests = [
-    { id: 1, client: 'مزرعة الخير', service: 'خدمات الحصاد', date: '2026-04-28', status: 'جديد' },
-    { id: 2, client: 'مزرعة النور', service: 'نقل المنتجات', date: '2026-04-27', status: 'قيد التنفيذ' },
-    { id: 3, client: 'مزرعة الوادي', service: 'الأسمدة العضوية', date: '2026-04-26', status: 'مكتمل' },
-    { id: 4, client: 'مزرعة البركة', service: 'الري الحديث', date: '2026-04-25', status: 'قيد التنفيذ' },
+    { id: 1, client: bi(locale, 'مزرعة الخير', 'Al Khair Farm'), service: bi(locale, 'خدمات الحصاد', 'Harvesting services'), date: '2026-04-28', status: bi(locale, 'جديد', 'New') },
+    { id: 2, client: bi(locale, 'مزرعة النور', 'Al Noor Farm'), service: bi(locale, 'نقل المنتجات', 'Product transport'), date: '2026-04-27', status: bi(locale, 'قيد التنفيذ', 'In progress') },
+    { id: 3, client: bi(locale, 'مزرعة الوادي', 'Al Wadi Farm'), service: bi(locale, 'الأسمدة العضوية', 'Organic fertilizers'), date: '2026-04-26', status: bi(locale, 'مكتمل', 'Completed') },
+    { id: 4, client: bi(locale, 'مزرعة البركة', 'Al Barakah Farm'), service: bi(locale, 'الري الحديث', 'Irrigation systems'), date: '2026-04-25', status: bi(locale, 'قيد التنفيذ', 'In progress') },
   ];
 
   const reviews = [
-    { id: 1, client: 'أحمد محمد', rating: 5, comment: 'خدمة ممتازة وسريعة', date: '2026-04-20' },
-    { id: 2, client: 'فاطمة علي', rating: 4.5, comment: 'جودة عالية وأسعار مناسبة', date: '2026-04-18' },
-    { id: 3, client: 'خالد سعيد', rating: 5, comment: 'محترفون جداً، أنصح بالتعامل معهم', date: '2026-04-15' },
+    { id: 1, client: bi(locale, 'أحمد محمد', 'Ahmed Mohammed'), rating: 5, comment: bi(locale, 'خدمة ممتازة وسريعة', 'Excellent and fast service'), date: '2026-04-20' },
+    { id: 2, client: bi(locale, 'فاطمة علي', 'Fatimah Ali'), rating: 4.5, comment: bi(locale, 'جودة عالية وأسعار مناسبة', 'Great quality and fair prices'), date: '2026-04-18' },
+    { id: 3, client: bi(locale, 'خالد سعيد', 'Khalid Saeed'), rating: 5, comment: bi(locale, 'محترفون جداً، أنصح بالتعامل معهم', 'Very professional — highly recommended'), date: '2026-04-15' },
   ];
 
   return (
     <div>
       <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-900">
-        بيانات تجريبية — لا تعكس بيانات حقيقية من المنصة بعد.
+        {bi(locale, 'بيانات تجريبية — لا تعكس بيانات حقيقية من المنصة بعد.', 'Sample data — not reflecting real platform data yet.')}
       </div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">لوحة التحكم</h1>
-          <p className="text-gray-600 mt-1">إدارة خدماتك ومنتجاتك</p>
+          <h1 className="text-3xl font-bold text-gray-900">{bi(locale, 'لوحة التحكم', 'Dashboard')}</h1>
+          <p className="text-gray-600 mt-1">{bi(locale, 'إدارة خدماتك ومنتجاتك', 'Manage your services and products')}</p>
         </div>
         <button
           type="button"
           disabled
-          title="قريباً — إدارة الخدمات من لوحة واحدة قيد التطوير"
+          title={bi(locale, 'قريباً — إدارة الخدمات من لوحة واحدة قيد التطوير', 'Coming soon — manage services from one dashboard')}
           className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg opacity-50 cursor-not-allowed"
         >
           <Plus className="size-5" />
-          <span>إضافة خدمة جديدة</span>
+          <span>{bi(locale, 'إضافة خدمة جديدة', 'Add new service')}</span>
         </button>
       </div>
 
@@ -67,7 +70,7 @@ export function SupplierDashboard() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">خدماتي</h2>
+              <h2 className="text-xl font-bold text-gray-900">{bi(locale, 'خدماتي', 'My services')}</h2>
             </div>
             <div className="p-6">
               <div className="grid md:grid-cols-2 gap-4">
@@ -82,7 +85,7 @@ export function SupplierDashboard() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-emerald-600 font-semibold">{service.price}</span>
-                      <span className="text-sm text-gray-500">{service.requests} طلب</span>
+                      <span className="text-sm text-gray-500">{service.requests} {bi(locale, 'طلب', 'requests')}</span>
                     </div>
                   </div>
                 ))}
@@ -93,7 +96,7 @@ export function SupplierDashboard() {
 
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">التقييمات</h2>
+            <h2 className="text-xl font-bold text-gray-900">{bi(locale, 'التقييمات', 'Reviews')}</h2>
           </div>
           <div className="p-6">
             <div className="text-center mb-6 p-4 bg-emerald-50 rounded-lg">
@@ -103,7 +106,7 @@ export function SupplierDashboard() {
                   <span key={star} className="text-yellow-500 text-xl">★</span>
                 ))}
               </div>
-              <p className="text-sm text-gray-600">من 48 تقييم</p>
+              <p className="text-sm text-gray-600">{bi(locale, 'من 48 تقييم', 'From 48 reviews')}</p>
             </div>
 
             <div className="space-y-4">
@@ -127,17 +130,17 @@ export function SupplierDashboard() {
 
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">الطلبات الأخيرة</h2>
+          <h2 className="text-xl font-bold text-gray-900">{bi(locale, 'الطلبات الأخيرة', 'Recent requests')}</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">العميل</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الخدمة</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">التاريخ</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراء</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{bi(locale, 'العميل', 'Client')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{bi(locale, 'الخدمة', 'Service')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{bi(locale, 'التاريخ', 'Date')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{bi(locale, 'الحالة', 'Status')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{bi(locale, 'الإجراء', 'Action')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -157,7 +160,7 @@ export function SupplierDashboard() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button className="text-emerald-600 hover:text-emerald-700 font-medium">
-                      عرض التفاصيل
+                      {bi(locale, 'عرض التفاصيل', 'View details')}
                     </button>
                   </td>
                 </tr>

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Search, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type ProfileRow = {
   id: string;
@@ -17,6 +19,7 @@ type ProfileRow = {
 
 export function AdminUsersPage() {
   const { user: currentUser } = useAuth();
+  const { locale } = useLocale();
   const [users, setUsers] = useState<ProfileRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +58,7 @@ export function AdminUsersPage() {
   async function act(action: 'ban' | 'unban' | 'suspend') {
     if (!target) return;
     if (action !== 'unban' && reason.trim().length < 3) {
-      setError('يرجى كتابة سبب واضح (3 أحرف على الأقل).');
+      setError(bi(locale, 'يرجى كتابة سبب واضح (3 أحرف على الأقل).', 'Please provide a clear reason (at least 3 characters).'));
       return;
     }
     setActing(true);
@@ -71,7 +74,7 @@ export function AdminUsersPage() {
       setReason('');
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'تعذر تنفيذ الإجراء');
+      setError(e instanceof Error ? e.message : bi(locale, 'تعذر تنفيذ الإجراء', "Couldn't perform action"));
     } finally {
       setActing(false);
     }
@@ -79,15 +82,17 @@ export function AdminUsersPage() {
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">المستخدمون</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">إدارة الحسابات: حظر، تعليق، إعادة تفعيل.</p>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{bi(locale, 'المستخدمون', 'Users')}</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        {bi(locale, 'إدارة الحسابات: حظر، تعليق، إعادة تفعيل.', 'Manage accounts: ban, suspend, unban.')}
+      </p>
 
       <div className="relative mb-4">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="ابحث بالاسم أو الجوال أو المعرّف..."
+          placeholder={bi(locale, 'ابحث بالاسم أو الجوال أو المعرّف...', 'Search by name, phone, or ID...')}
           className="w-full pr-10 pl-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
         />
       </div>
@@ -98,19 +103,19 @@ export function AdminUsersPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300">
             <tr>
-              <th className="p-3 text-right">الاسم</th>
-              <th className="p-3 text-right">النوع</th>
-              <th className="p-3 text-right">الدور</th>
-              <th className="p-3 text-right">الحالة</th>
-              <th className="p-3 text-right">انضم في</th>
-              <th className="p-3 text-right">إجراءات</th>
+              <th className="p-3 text-right">{bi(locale, 'الاسم', 'Name')}</th>
+              <th className="p-3 text-right">{bi(locale, 'النوع', 'Type')}</th>
+              <th className="p-3 text-right">{bi(locale, 'الدور', 'Role')}</th>
+              <th className="p-3 text-right">{bi(locale, 'الحالة', 'Status')}</th>
+              <th className="p-3 text-right">{bi(locale, 'انضم في', 'Joined')}</th>
+              <th className="p-3 text-right">{bi(locale, 'إجراءات', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td className="p-6 text-center text-gray-500" colSpan={6}>جارٍ التحميل...</td></tr>
+              <tr><td className="p-6 text-center text-gray-500" colSpan={6}>{bi(locale, 'جارٍ التحميل...', 'Loading...')}</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td className="p-6 text-center text-gray-500" colSpan={6}>لا يوجد مستخدمون</td></tr>
+              <tr><td className="p-6 text-center text-gray-500" colSpan={6}>{bi(locale, 'لا يوجد مستخدمون', 'No users')}</td></tr>
             ) : (
               filtered.map((u) => (
                 <tr key={u.id} className="border-t border-gray-100 dark:border-gray-700">
@@ -128,9 +133,13 @@ export function AdminUsersPage() {
                   </td>
                   <td className="p-3">
                     <StatusBadge status={u.status} />
-                    {u.banned_reason && <p className="text-xs text-gray-500 mt-1">السبب: {u.banned_reason}</p>}
+                    {u.banned_reason && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {bi(locale, 'السبب:', 'Reason:')} {u.banned_reason}
+                      </p>
+                    )}
                   </td>
-                  <td className="p-3 text-gray-600 dark:text-gray-400">{new Date(u.created_at).toLocaleDateString('ar-SA')}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-400">{new Date(u.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'ar-SA')}</td>
                   <td className="p-3">
                     {u.id === currentUser?.id ? (
                       <span className="text-gray-400 text-xs">—</span>

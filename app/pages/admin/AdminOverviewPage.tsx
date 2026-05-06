@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Package, Users, Flag, MessageSquareWarning, ShoppingBag, TrendingUp, LogIn, Eye } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 interface Kpis {
   publishedListings: number;
@@ -19,6 +21,7 @@ const sevenDaysAgo = () => new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOS
 const twentyFourHoursAgo = () => new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
 export function AdminOverviewPage() {
+  const { locale } = useLocale();
   const [kpis, setKpis] = useState<Kpis | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +62,7 @@ export function AdminOverviewPage() {
           visits24h: visits24.count ?? 0,
         });
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'تعذر تحميل المؤشرات');
+        if (!cancelled) setError(e instanceof Error ? e.message : bi(locale, 'تعذر تحميل المؤشرات', "Couldn't load KPIs"));
       }
     }
     void load();
@@ -70,25 +73,56 @@ export function AdminOverviewPage() {
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">نظرة عامة</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">المؤشرات الرئيسية للمنصة (آخر 7 أيام).</p>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{bi(locale, 'نظرة عامة', 'Overview')}</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-8">
+        {bi(locale, 'المؤشرات الرئيسية للمنصة (آخر 7 أيام).', 'Key platform metrics (last 7 days).')}
+      </p>
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-6">{error}</div>
       )}
 
       {!kpis ? (
-        <div className="text-gray-500 dark:text-gray-400">جارٍ التحميل...</div>
+        <div className="text-gray-500 dark:text-gray-400">{bi(locale, 'جارٍ التحميل...', 'Loading...')}</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <KpiCard icon={Package} label="إعلانات منشورة" value={kpis.publishedListings} delta={`${kpis.newListings7d} جديد`} accent="emerald" />
-          <KpiCard icon={Users} label="إجمالي المستخدمين" value={kpis.totalUsers} delta={`${kpis.newUsers7d} هذا الأسبوع`} accent="sky" />
-          <KpiCard icon={ShoppingBag} label="طلبات قيد المراجعة" value={kpis.pendingOrders} accent="amber" />
-          <KpiCard icon={Flag} label="بلاغات مفتوحة" value={kpis.openReports} accent="rose" />
-          <KpiCard icon={MessageSquareWarning} label="شكاوى/اقتراحات جديدة" value={kpis.newFeedback} accent="purple" />
-          <KpiCard icon={TrendingUp} label="متوسط الرضا (CSAT)" value={kpis.csatAvg != null ? `${kpis.csatAvg.toFixed(1)} / 5` : '—'} accent="emerald" />
-          <KpiCard icon={LogIn} label="تسجيلات الدخول (24 ساعة)" value={kpis.logins24h} delta="من جدول الأحداث" accent="sky" />
-          <KpiCard icon={Eye} label="زيارات الموقع (24 ساعة)" value={kpis.visits24h} delta="من منارة الزيارة" accent="purple" />
+          <KpiCard
+            icon={Package}
+            label={bi(locale, 'إعلانات منشورة', 'Published listings')}
+            value={kpis.publishedListings}
+            delta={bi(locale, `${kpis.newListings7d} جديد`, `${kpis.newListings7d} new`)}
+            accent="emerald"
+          />
+          <KpiCard
+            icon={Users}
+            label={bi(locale, 'إجمالي المستخدمين', 'Total users')}
+            value={kpis.totalUsers}
+            delta={bi(locale, `${kpis.newUsers7d} هذا الأسبوع`, `${kpis.newUsers7d} this week`)}
+            accent="sky"
+          />
+          <KpiCard icon={ShoppingBag} label={bi(locale, 'طلبات قيد المراجعة', 'Pending orders')} value={kpis.pendingOrders} accent="amber" />
+          <KpiCard icon={Flag} label={bi(locale, 'بلاغات مفتوحة', 'Open reports')} value={kpis.openReports} accent="rose" />
+          <KpiCard icon={MessageSquareWarning} label={bi(locale, 'شكاوى/اقتراحات جديدة', 'New feedback')} value={kpis.newFeedback} accent="purple" />
+          <KpiCard
+            icon={TrendingUp}
+            label={bi(locale, 'متوسط الرضا (CSAT)', 'CSAT average')}
+            value={kpis.csatAvg != null ? `${kpis.csatAvg.toFixed(1)} / 5` : '—'}
+            accent="emerald"
+          />
+          <KpiCard
+            icon={LogIn}
+            label={bi(locale, 'تسجيلات الدخول (24 ساعة)', 'Logins (24h)')}
+            value={kpis.logins24h}
+            delta={bi(locale, 'من جدول الأحداث', 'From events table')}
+            accent="sky"
+          />
+          <KpiCard
+            icon={Eye}
+            label={bi(locale, 'زيارات الموقع (24 ساعة)', 'Visits (24h)')}
+            value={kpis.visits24h}
+            delta={bi(locale, 'من منارة الزيارة', 'From visit beacon')}
+            accent="purple"
+          />
         </div>
       )}
     </div>

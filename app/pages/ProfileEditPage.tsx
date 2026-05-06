@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useT } from '../i18n/useT';
 import { uploadAvatar } from '../lib/avatarStorage';
 import { supabase } from '../lib/supabaseClient';
+import { bi } from '../i18n/bilingual';
 
 export function ProfileEditPage() {
   const { user, refreshProfile } = useAuth();
@@ -12,11 +13,11 @@ export function ProfileEditPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profileData, setProfileData] = useState({
-    name: user?.name || 'أحمد محمد',
+    name: user?.name || bi(locale, 'أحمد محمد', 'Ahmed Mohammed'),
     email: user?.email || 'ahmed@example.com',
     phone: '0501234567',
     image: user?.image || '',
-    location: 'الرياض',
+    location: bi(locale, 'الرياض', 'Riyadh'),
   });
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -55,7 +56,7 @@ export function ProfileEditPage() {
       await refreshProfile();
       setAvatarFile(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : (locale === 'en' ? 'Failed to save profile' : 'تعذر حفظ الملف الشخصي'));
+      setError(e instanceof Error ? e.message : bi(locale, 'تعذر حفظ الملف الشخصي', 'Failed to save profile'));
     } finally {
       setIsSaving(false);
     }
@@ -72,11 +73,11 @@ export function ProfileEditPage() {
             className="inline-flex items-center gap-2 text-sky-900 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition mb-4"
           >
             <ArrowRight className="size-5" />
-            {locale === 'en' ? 'Back to dashboard' : 'العودة للوحة التحكم'}
+            {bi(locale, 'العودة للوحة التحكم', 'Back to dashboard')}
           </Link>
           <h1 className="text-4xl font-bold text-sky-900 dark:text-white">{t('profile.editTitle')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {locale === 'en' ? 'Update your personal info' : 'قم بتحديث معلوماتك الشخصية'}
+            {bi(locale, 'قم بتحديث معلوماتك الشخصية', 'Update your personal info')}
           </p>
         </div>
 
@@ -115,7 +116,7 @@ export function ProfileEditPage() {
               </label>
             </div>
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              انقر على أيقونة الكاميرا لتحديث صورة الملف الشخصي
+              {bi(locale, 'انقر على أيقونة الكاميرا لتحديث صورة الملف الشخصي', 'Click the camera icon to update your profile picture')}
             </p>
           </div>
 
@@ -124,7 +125,7 @@ export function ProfileEditPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  الاسم الكامل
+                  {bi(locale, 'الاسم الكامل', 'Full name')}
                 </label>
                 <div className="relative">
                   <User className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -141,14 +142,18 @@ export function ProfileEditPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  نوع الحساب
+                  {bi(locale, 'نوع الحساب', 'Account type')}
                 </label>
                 <div className="relative">
                   <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                    {user?.userType === 'buyer' ? 'مشتري' : user?.userType === 'farmer' ? 'مزارع' : 'مورد'}
+                    {user?.userType === 'buyer'
+                      ? bi(locale, 'مشتري', 'Buyer')
+                      : user?.userType === 'farmer'
+                        ? bi(locale, 'مزارع', 'Farmer')
+                        : bi(locale, 'مورد', 'Supplier')}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    لا يمكن تغيير نوع الحساب
+                    {bi(locale, 'لا يمكن تغيير نوع الحساب', "Account type can't be changed")}
                   </p>
                 </div>
               </div>
@@ -156,7 +161,7 @@ export function ProfileEditPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                البريد الإلكتروني
+                {bi(locale, 'البريد الإلكتروني', 'Email')}
               </label>
               <div className="relative">
                 <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -174,7 +179,7 @@ export function ProfileEditPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  رقم الجوال
+                  {bi(locale, 'رقم الجوال', 'Phone number')}
                 </label>
                 <div className="relative">
                   <Phone className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -191,7 +196,7 @@ export function ProfileEditPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  الموقع
+                  {bi(locale, 'الموقع', 'Location')}
                 </label>
                 <div className="relative">
                   <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -202,7 +207,7 @@ export function ProfileEditPage() {
                       setProfileData({ ...profileData, location: e.target.value })
                     }
                     className="w-full pr-12 pl-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    placeholder="المدينة، المنطقة"
+                    placeholder={bi(locale, 'المدينة، المنطقة', 'City, region')}
                   />
                 </div>
               </div>
@@ -215,13 +220,13 @@ export function ProfileEditPage() {
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-sky-900 to-emerald-600 text-white rounded-lg hover:opacity-90 transition font-semibold"
               >
                 <Save className="size-5" />
-                {isSaving ? (locale === 'en' ? 'Saving…' : 'جارٍ الحفظ...') : locale === 'en' ? 'Save changes' : 'حفظ التغييرات'}
+                {isSaving ? bi(locale, 'جارٍ الحفظ...', 'Saving…') : bi(locale, 'حفظ التغييرات', 'Save changes')}
               </button>
               <Link
                 to={dashboardPath}
                 className="px-8 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-semibold"
               >
-                {locale === 'en' ? 'Cancel' : 'إلغاء'}
+                {bi(locale, 'إلغاء', 'Cancel')}
               </Link>
             </div>
           </div>

@@ -3,6 +3,7 @@ import { User, Moon, Sun, ArrowRight, ChevronLeft } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useT } from '../i18n/useT';
+import { bi } from '../i18n/bilingual';
 
 export function SettingsPage() {
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -19,11 +20,11 @@ export function SettingsPage() {
             className="inline-flex items-center gap-2 text-sky-900 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition mb-4"
           >
             <ArrowRight className="size-5" />
-            {locale === 'en' ? 'Back to dashboard' : 'العودة للوحة التحكم'}
+            {bi(locale, 'العودة للوحة التحكم', 'Back to dashboard')}
           </Link>
           <h1 className="text-4xl font-bold text-sky-900 dark:text-white">{t('settings.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {locale === 'en' ? 'Manage your account and preferences' : 'إدارة إعدادات حسابك والتفضيلات'}
+            {t('settings.subtitle')}
           </p>
         </div>
 
@@ -43,9 +44,7 @@ export function SettingsPage() {
                     {t('profile.editTitle')}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {locale === 'en'
-                      ? 'Update your details and profile picture'
-                      : 'قم بتحديث معلوماتك الشخصية وصورة الملف الشخصي'}
+                    {bi(locale, 'قم بتحديث معلوماتك الشخصية وصورة الملف الشخصي', 'Update your details and profile picture')}
                   </p>
                 </div>
               </div>
@@ -66,16 +65,16 @@ export function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                    {locale === 'en' ? 'Dark mode' : 'الوضع الداكن'}
+                    {t('settings.darkMode')}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {locale === 'en'
                       ? isDarkMode
-                        ? 'Dark mode is on'
-                        : 'Light mode is on'
+                        ? t('settings.darkModeOn')
+                        : t('settings.lightModeOn')
                       : isDarkMode
-                        ? 'الوضع الداكن مفعّل حالياً'
-                        : 'الوضع الفاتح مفعّل حالياً'}
+                        ? t('settings.darkModeOn')
+                        : t('settings.lightModeOn')}
                   </p>
                 </div>
               </div>

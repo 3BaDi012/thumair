@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type OrderRow = {
   id: string;
@@ -17,6 +19,7 @@ type OrderRow = {
 const STATUSES = ['all', 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'disputed'] as const;
 
 export function AdminOrdersPage() {
+  const { locale } = useLocale();
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,8 +46,8 @@ export function AdminOrdersPage() {
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">الطلبات</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">جميع الطلبات على المنصة.</p>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{bi(locale, 'الطلبات', 'Orders')}</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">{bi(locale, 'جميع الطلبات على المنصة.', 'All orders on the platform.')}</p>
 
       <div className="flex flex-wrap gap-2 mb-4">
         {STATUSES.map((s) => (
@@ -55,7 +58,7 @@ export function AdminOrdersPage() {
               filter === s ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
-            {s === 'all' ? 'الكل' : s}
+            {s === 'all' ? bi(locale, 'الكل', 'All') : s}
           </button>
         ))}
       </div>
@@ -66,18 +69,18 @@ export function AdminOrdersPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300">
             <tr>
-              <th className="p-3 text-right">المنتج</th>
-              <th className="p-3 text-right">الكمية</th>
-              <th className="p-3 text-right">السعر</th>
-              <th className="p-3 text-right">الحالة</th>
-              <th className="p-3 text-right">التاريخ</th>
+              <th className="p-3 text-right">{bi(locale, 'المنتج', 'Product')}</th>
+              <th className="p-3 text-right">{bi(locale, 'الكمية', 'Quantity')}</th>
+              <th className="p-3 text-right">{bi(locale, 'السعر', 'Price')}</th>
+              <th className="p-3 text-right">{bi(locale, 'الحالة', 'Status')}</th>
+              <th className="p-3 text-right">{bi(locale, 'التاريخ', 'Date')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>جارٍ التحميل...</td></tr>
+              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>{bi(locale, 'جارٍ التحميل...', 'Loading...')}</td></tr>
             ) : orders.length === 0 ? (
-              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>لا توجد طلبات</td></tr>
+              <tr><td className="p-6 text-center text-gray-500" colSpan={5}>{bi(locale, 'لا توجد طلبات', 'No orders')}</td></tr>
             ) : (
               orders.map((o) => (
                 <tr key={o.id} className="border-t border-gray-100 dark:border-gray-700">
@@ -87,7 +90,7 @@ export function AdminOrdersPage() {
                   <td className="p-3">
                     <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-700">{o.status}</span>
                   </td>
-                  <td className="p-3 text-gray-600 dark:text-gray-400">{new Date(o.created_at).toLocaleDateString('ar-SA')}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-400">{new Date(o.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'ar-SA')}</td>
                 </tr>
               ))
             )}

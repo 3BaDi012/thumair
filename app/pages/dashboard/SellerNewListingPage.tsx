@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
 import { ListingForm, type ListingFormValues } from '../../components/listings/ListingForm';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type Org = { id: string; name: string; type: string };
 
 export function SellerNewListingPage() {
   const navigate = useNavigate();
   const { supabaseUser } = useAuth();
+  const { locale } = useLocale();
 
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [orgId, setOrgId] = useState<string>('');
@@ -74,14 +77,14 @@ export function SellerNewListingPage() {
   async function onCreateDraft() {
     setError(null);
     if (!values.title.trim()) {
-      setError('أدخل عنوان الإعلان');
+      setError(bi(locale, 'أدخل عنوان الإعلان', 'Enter a listing title'));
       return;
     }
     setLoading(true);
     try {
       let effectiveOrgId = orgId;
       if (!effectiveOrgId) {
-        if (!orgName.trim()) throw new Error('أدخل اسم المزرعة أولاً');
+        if (!orgName.trim()) throw new Error(bi(locale, 'أدخل اسم المزرعة أولاً', 'Enter the farm name first'));
         effectiveOrgId = await createFarmOrgAndMembership();
       }
 
@@ -110,7 +113,7 @@ export function SellerNewListingPage() {
       if (listingError) throw listingError;
       navigate(`/dashboard/listings/${listing.id}/edit`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'تعذر إنشاء الإعلان');
+      setError(e instanceof Error ? e.message : bi(locale, 'تعذر إنشاء الإعلان', "Couldn't create listing"));
     } finally {
       setLoading(false);
     }
@@ -119,8 +122,8 @@ export function SellerNewListingPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-6 py-10 max-w-2xl">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">إضافة إعلان جديد</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">سيتم حفظه كمسودة أولاً.</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{bi(locale, 'إضافة إعلان جديد', 'Add new listing')}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">{bi(locale, 'سيتم حفظه كمسودة أولاً.', 'It will be saved as a draft first.')}</p>
 
         {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-4">{error}</div>}
 
@@ -128,7 +131,7 @@ export function SellerNewListingPage() {
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-5">
           {orgs.length > 0 ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">المزرعة</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{bi(locale, 'المزرعة', 'Farm')}</label>
               <select
                 value={orgId}
                 onChange={(e) => setOrgId(e.target.value)}
@@ -143,14 +146,16 @@ export function SellerNewListingPage() {
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">اسم المزرعة</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{bi(locale, 'اسم المزرعة', 'Farm name')}</label>
               <input
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                placeholder="مثال: مزرعة البركة"
+                placeholder={bi(locale, 'مثال: مزرعة البركة', 'e.g. Al Barakah Farm')}
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">إذا لم تكن لديك مزرعة مسجلة، سننشئ واحدة ونربطك كـ Owner.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                {bi(locale, 'إذا لم تكن لديك مزرعة مسجلة، سننشئ واحدة ونربطك كـ Owner.', "If you don't have a registered farm, we'll create one and link you as the Owner.")}
+              </p>
             </div>
           )}
           </div>
@@ -163,7 +168,7 @@ export function SellerNewListingPage() {
             onClick={() => void onCreateDraft()}
             className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700 transition disabled:opacity-50"
           >
-            {loading ? 'جارٍ الإنشاء...' : 'إنشاء مسودة'}
+            {loading ? bi(locale, 'جارٍ الإنشاء...', 'Creating...') : bi(locale, 'إنشاء مسودة', 'Create draft')}
           </button>
         </div>
       </div>

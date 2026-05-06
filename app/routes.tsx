@@ -27,6 +27,8 @@ import { SellerNewListingPage } from './pages/dashboard/SellerNewListingPage';
 import { SellerEditListingPage } from './pages/dashboard/SellerEditListingPage';
 import { RequireBuyer } from './components/RequireBuyer';
 import { RequireSeller } from './components/RequireSeller';
+import { useLocale } from './context/LocaleContext';
+import { bi } from './i18n/bilingual';
 
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
 const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })));
@@ -39,11 +41,14 @@ const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage').then(
 const AdminBroadcastPage = lazy(() => import('./pages/admin/AdminBroadcastPage').then((m) => ({ default: m.AdminBroadcastPage })));
 const AdminMessagesPage = lazy(() => import('./pages/admin/AdminMessagesPage').then((m) => ({ default: m.AdminMessagesPage })));
 
-const adminSuspense = (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400">
-    جارٍ تحميل لوحة الإدارة...
-  </div>
-);
+function AdminSuspenseFallback() {
+  const { locale } = useLocale();
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400">
+      {bi(locale, 'جارٍ تحميل لوحة الإدارة...', 'Loading admin dashboard...')}
+    </div>
+  );
+}
 
 export const router = createBrowserRouter([
   {
@@ -87,7 +92,7 @@ export const router = createBrowserRouter([
       {
         path: '/admin',
         element: (
-          <Suspense fallback={adminSuspense}>
+          <Suspense fallback={<AdminSuspenseFallback />}>
             <AdminLayout />
           </Suspense>
         ),

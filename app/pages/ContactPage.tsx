@@ -3,8 +3,11 @@ import { Link } from 'react-router';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { Mail, Phone, MapPin, Send, X, Instagram, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useLocale } from '../context/LocaleContext';
+import { bi } from '../i18n/bilingual';
 
 export function ContactPage() {
+  const { locale } = useLocale();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -47,7 +50,7 @@ export function ContactPage() {
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       }, 4000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'تعذر إرسال الرسالة');
+      setError(err instanceof Error ? err.message : bi(locale, 'تعذر إرسال الرسالة', "Couldn't send the message"));
     } finally {
       setSubmitting(false);
     }
@@ -62,7 +65,7 @@ export function ContactPage() {
               <ThumairLogoWithText />
             </Link>
             <Link to="/home" className="text-gray-600 hover:text-sky-900 transition">
-              العودة للرئيسية ←
+              {bi(locale, 'العودة للرئيسية ←', 'Back to home ←')}
             </Link>
           </div>
         </div>
@@ -72,10 +75,10 @@ export function ContactPage() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold mb-6" style={{ color: '#0C4A6E' }}>
-              تواصل معنا
+              {bi(locale, 'تواصل معنا', 'Contact us')}
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              نحن هنا للإجابة على استفساراتك ومساعدتك في أي وقت
+              {bi(locale, 'نحن هنا للإجابة على استفساراتك ومساعدتك في أي وقت', "We're here to answer your questions and help anytime")}
             </p>
           </div>
 
@@ -83,7 +86,7 @@ export function ContactPage() {
             {/* Contact Form */}
             <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
               <h2 className="text-2xl font-bold mb-6" style={{ color: '#0C4A6E' }}>
-                أرسل لنا رسالة
+                {bi(locale, 'أرسل لنا رسالة', 'Send us a message')}
               </h2>
 
               {submitted ? (
@@ -91,8 +94,12 @@ export function ContactPage() {
                   <div className="size-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="size-10 text-emerald-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-emerald-900 mb-3">تم الإرسال بنجاح!</h3>
-                  <p className="text-gray-600">شكراً لتواصلك معنا. سنرد عليك في أقرب وقت ممكن.</p>
+                  <h3 className="text-2xl font-bold text-emerald-900 mb-3">
+                    {bi(locale, 'تم الإرسال بنجاح!', 'Sent successfully!')}
+                  </h3>
+                  <p className="text-gray-600">
+                    {bi(locale, 'شكراً لتواصلك معنا. سنرد عليك في أقرب وقت ممكن.', "Thanks for reaching out. We'll reply as soon as possible.")}
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -101,7 +108,7 @@ export function ContactPage() {
                   )}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      الاسم الكامل *
+                      {bi(locale, 'الاسم الكامل *', 'Full name *')}
                     </label>
                     <input
                       type="text"
@@ -109,14 +116,14 @@ export function ContactPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
-                      placeholder="أدخل اسمك الكامل"
+                      placeholder={bi(locale, 'أدخل اسمك الكامل', 'Enter your full name')}
                     />
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        البريد الإلكتروني *
+                        {bi(locale, 'البريد الإلكتروني *', 'Email *')}
                       </label>
                       <input
                         type="email"
@@ -130,7 +137,7 @@ export function ContactPage() {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        رقم الجوال
+                        {bi(locale, 'رقم الجوال', 'Phone number')}
                       </label>
                       <input
                         type="tel"
@@ -144,7 +151,7 @@ export function ContactPage() {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      الموضوع *
+                      {bi(locale, 'الموضوع *', 'Subject *')}
                     </label>
                     <select
                       required
@@ -152,18 +159,18 @@ export function ContactPage() {
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
                     >
-                      <option value="">اختر الموضوع</option>
-                      <option value="general">استفسار عام</option>
-                      <option value="technical">دعم فني</option>
-                      <option value="business">شراكة تجارية</option>
-                      <option value="complaint">شكوى</option>
-                      <option value="suggestion">اقتراح</option>
+                      <option value="">{bi(locale, 'اختر الموضوع', 'Choose a subject')}</option>
+                      <option value="general">{bi(locale, 'استفسار عام', 'General inquiry')}</option>
+                      <option value="technical">{bi(locale, 'دعم فني', 'Technical support')}</option>
+                      <option value="business">{bi(locale, 'شراكة تجارية', 'Business partnership')}</option>
+                      <option value="complaint">{bi(locale, 'شكوى', 'Complaint')}</option>
+                      <option value="suggestion">{bi(locale, 'اقتراح', 'Suggestion')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      الرسالة *
+                      {bi(locale, 'الرسالة *', 'Message *')}
                     </label>
                     <textarea
                       required
@@ -171,7 +178,7 @@ export function ContactPage() {
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       rows={6}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition resize-none"
-                      placeholder="اكتب رسالتك هنا..."
+                      placeholder={bi(locale, 'اكتب رسالتك هنا...', 'Write your message here...')}
                     />
                   </div>
 
@@ -182,7 +189,7 @@ export function ContactPage() {
                     style={{ background: 'linear-gradient(135deg, #0C4A6E 0%, #10B981 100%)' }}
                   >
                     <Send className="size-5" />
-                    {submitting ? 'جارٍ الإرسال...' : 'إرسال الرسالة'}
+                    {submitting ? bi(locale, 'جارٍ الإرسال...', 'Sending...') : bi(locale, 'إرسال الرسالة', 'Send message')}
                   </button>
                 </form>
               )}
@@ -191,7 +198,7 @@ export function ContactPage() {
             {/* Contact Information */}
             <div>
               <div className="bg-gradient-to-br from-sky-900 to-sky-800 text-white rounded-2xl p-8 md:p-10 mb-8">
-                <h2 className="text-2xl font-bold mb-8">معلومات التواصل</h2>
+                <h2 className="text-2xl font-bold mb-8">{bi(locale, 'معلومات التواصل', 'Contact information')}</h2>
 
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
@@ -199,7 +206,7 @@ export function ContactPage() {
                       <Mail className="size-6 text-emerald-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">البريد الإلكتروني</h3>
+                      <h3 className="font-semibold mb-1">{bi(locale, 'البريد الإلكتروني', 'Email')}</h3>
                       <a href="mailto:thumair.sa@hotmail.com" className="text-sky-200 hover:text-emerald-400 transition">
                         thumair.sa@hotmail.com
                       </a>
@@ -211,7 +218,7 @@ export function ContactPage() {
                       <Phone className="size-6 text-emerald-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">الهاتف</h3>
+                      <h3 className="font-semibold mb-1">{bi(locale, 'الهاتف', 'Phone')}</h3>
                       <a href="tel:+966505650213" className="text-sky-200 hover:text-emerald-400 transition" dir="ltr">
                         +966 50 565 0213
                       </a>
@@ -223,14 +230,14 @@ export function ContactPage() {
                       <MapPin className="size-6 text-emerald-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">الموقع</h3>
-                      <p className="text-sky-200">المملكة العربية السعودية</p>
+                      <h3 className="font-semibold mb-1">{bi(locale, 'الموقع', 'Location')}</h3>
+                      <p className="text-sky-200">{bi(locale, 'المملكة العربية السعودية', 'Saudi Arabia')}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-white/20">
-                  <h3 className="font-semibold mb-4">تابعنا على</h3>
+                  <h3 className="font-semibold mb-4">{bi(locale, 'تابعنا على', 'Follow us')}</h3>
                   <div className="flex gap-4">
                     <a
                       href="https://x.com/thumair_sa"
@@ -241,7 +248,7 @@ export function ContactPage() {
                       <X className="size-6" />
                     </a>
                     <a
-                      href="https://instagram.com/thumair_sa"
+                      href="https://instagram.com/thumair.sa"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="size-12 bg-white/10 backdrop-blur rounded-lg flex items-center justify-center hover:bg-emerald-500 transition"
@@ -254,16 +261,16 @@ export function ContactPage() {
 
               <div className="bg-gradient-to-br from-emerald-50 to-sky-50 rounded-2xl p-8">
                 <h3 className="text-xl font-bold mb-4" style={{ color: '#0C4A6E' }}>
-                  ساعات العمل
+                  {bi(locale, 'ساعات العمل', 'Working hours')}
                 </h3>
                 <div className="space-y-3 text-gray-700">
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold">الأحد - الخميس</span>
-                    <span>8:00 ص - 5:00 م</span>
+                    <span className="font-semibold">{bi(locale, 'الأحد - الخميس', 'Sunday - Thursday')}</span>
+                    <span>{bi(locale, '8:00 ص - 5:00 م', '8:00 AM - 5:00 PM')}</span>
                   </div>
                   <div className="flex justify-between items-center text-gray-500">
-                    <span className="font-semibold">الجمعة - السبت</span>
-                    <span>مغلق</span>
+                    <span className="font-semibold">{bi(locale, 'الجمعة - السبت', 'Friday - Saturday')}</span>
+                    <span>{bi(locale, 'مغلق', 'Closed')}</span>
                   </div>
                 </div>
               </div>

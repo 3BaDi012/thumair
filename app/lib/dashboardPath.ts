@@ -1,7 +1,7 @@
 import type { AppUser } from '../context/AuthContext';
 
 export function dashboardPathForUser(user: AppUser | null | undefined): string {
-  if (!user?.userType) return '/welcome';
+  if (!user?.userType) return '/home';
   return user.userType === 'buyer' ? '/dashboard/buyer' : '/dashboard/farmer';
 }
 

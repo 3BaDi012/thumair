@@ -1,8 +1,167 @@
 import { Link } from 'react-router';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { Shield, Lock, Eye, Database, Users, AlertCircle } from 'lucide-react';
+import { useLocale } from '../context/LocaleContext';
 
 export function PrivacyPolicyPage() {
+  const { locale } = useLocale();
+
+  if (locale === 'en') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
+        <header className="bg-white border-b border-sky-200 sticky top-0 z-10 shadow-sm">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+            <Link to="/home">
+              <ThumairLogoWithText />
+            </Link>
+            <Link to="/home" className="text-sm text-sky-900 hover:text-sky-700 transition">
+              Back to home ←
+            </Link>
+          </div>
+        </header>
+
+        <div className="container mx-auto px-6 py-12 max-w-4xl">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center size-20 bg-gradient-to-br from-sky-900 to-emerald-600 text-white rounded-2xl mb-6">
+              <Shield className="size-10" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4" style={{ color: '#0C4A6E' }}>
+              Privacy Policy
+            </h1>
+            <p className="text-gray-600">Last updated: Apr 28, 2026</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8 text-gray-700 leading-relaxed">
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-sky-100 rounded-lg flex items-center justify-center">
+                  <Eye className="size-5 text-sky-900" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Introduction
+                </h2>
+              </div>
+              <p className="text-sm">
+                We are committed to protecting your privacy and the security of your personal information. This policy
+                explains what we collect, how we use it, and how we protect it.
+              </p>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <Database className="size-5 text-emerald-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Information we collect
+                </h2>
+              </div>
+              <div className="space-y-4 text-sm">
+                <div className="pl-6 border-l-4 border-sky-200">
+                  <h3 className="font-bold text-sky-900 mb-2">1. Account information</h3>
+                  <ul className="space-y-2">
+                    <li>• Full name and user type</li>
+                    <li>• Email address and phone number</li>
+                    <li>• Location (city/region)</li>
+                  </ul>
+                </div>
+                <div className="pl-6 border-l-4 border-sky-200">
+                  <h3 className="font-bold text-sky-900 mb-2">2. Transaction information</h3>
+                  <ul className="space-y-2">
+                    <li>• Listing and order records</li>
+                    <li>• Reviews and ratings</li>
+                    <li>• Messages and support requests (when applicable)</li>
+                  </ul>
+                </div>
+                <div className="pl-6 border-l-4 border-sky-200">
+                  <h3 className="font-bold text-sky-900 mb-2">3. Technical information</h3>
+                  <ul className="space-y-2">
+                    <li>• Device/browser information and IP address</li>
+                    <li>• Usage analytics within the platform</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+                  <Users className="size-5 text-cyan-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  How we use information
+                </h2>
+              </div>
+              <ul className="space-y-2 text-sm">
+                <li>• Facilitate communication and transactions between users</li>
+                <li>• Improve user experience and personalize content</li>
+                <li>• Send important notifications and updates</li>
+                <li>• Maintain platform security and prevent fraud</li>
+                <li>• Analyze usage to improve services</li>
+              </ul>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Lock className="size-5 text-purple-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Data protection
+                </h2>
+              </div>
+              <div className="bg-gradient-to-br from-sky-50 to-emerald-50 rounded-xl p-6 space-y-2 text-sm">
+                <p>• We use encryption and modern security practices to protect your data.</p>
+                <p>• Access to data is restricted to authorized personnel when necessary.</p>
+                <p>• We periodically review our security controls.</p>
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="size-5 text-amber-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Your rights
+                </h2>
+              </div>
+              <ul className="space-y-2 text-sm">
+                <li>• Access and review your personal data</li>
+                <li>• Update or correct your information</li>
+                <li>• Request account deletion (subject to legal/operational constraints)</li>
+                <li>• Object to certain processing in specific circumstances</li>
+                <li>• Withdraw consent where applicable</li>
+              </ul>
+            </section>
+
+            <section className="bg-sky-50 rounded-xl p-6">
+              <h2 className="text-xl font-bold mb-3" style={{ color: '#0C4A6E' }}>
+                Contact
+              </h2>
+              <p className="text-sm">
+                Questions about this policy? Email:{' '}
+                <a href="mailto:thumair.sa@hotmail.com" className="text-sky-900 hover:underline">
+                  thumair.sa@hotmail.com
+                </a>
+              </p>
+              <p className="text-sm mt-1">
+                Phone:{' '}
+                <a href="tel:+966505650213" className="text-sky-900 hover:underline" dir="ltr">
+                  +966 50 565 0213
+                </a>
+              </p>
+            </section>
+
+            <div className="text-center text-sm text-gray-500 pt-6 border-t border-gray-200">
+              We may update this policy from time to time. Material changes will be communicated where appropriate.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       <header className="bg-white border-b border-sky-200 sticky top-0 z-10 shadow-sm">

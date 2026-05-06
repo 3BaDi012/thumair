@@ -13,18 +13,20 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { RequireAdmin } from '../../components/RequireAdmin';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 const NAV = [
-  { to: '/admin', label: 'نظرة عامة', icon: LayoutDashboard, end: true },
-  { to: '/admin/listings', label: 'الإعلانات', icon: Package, end: false },
-  { to: '/admin/orders', label: 'الطلبات', icon: ShoppingBag, end: false },
-  { to: '/admin/users', label: 'المستخدمون', icon: Users, end: false },
-  { to: '/admin/reports', label: 'البلاغات', icon: Flag, end: false },
-  { to: '/admin/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning, end: false },
-  { to: '/admin/broadcast', label: 'إشعار جماعي', icon: Megaphone, end: false },
-  { to: '/admin/messages', label: 'رسائل الإدارة', icon: Inbox, end: false },
-  { to: '/admin/audit', label: 'سجل التدقيق', icon: ScrollText, end: false },
-];
+  { to: '/admin', labelAr: 'نظرة عامة', labelEn: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/admin/listings', labelAr: 'الإعلانات', labelEn: 'Listings', icon: Package, end: false },
+  { to: '/admin/orders', labelAr: 'الطلبات', labelEn: 'Orders', icon: ShoppingBag, end: false },
+  { to: '/admin/users', labelAr: 'المستخدمون', labelEn: 'Users', icon: Users, end: false },
+  { to: '/admin/reports', labelAr: 'البلاغات', labelEn: 'Reports', icon: Flag, end: false },
+  { to: '/admin/feedback', labelAr: 'الشكاوى والاقتراحات', labelEn: 'Feedback', icon: MessageSquareWarning, end: false },
+  { to: '/admin/broadcast', labelAr: 'إشعار جماعي', labelEn: 'Broadcast', icon: Megaphone, end: false },
+  { to: '/admin/messages', labelAr: 'رسائل الإدارة', labelEn: 'Admin messages', icon: Inbox, end: false },
+  { to: '/admin/audit', labelAr: 'سجل التدقيق', labelEn: 'Audit log', icon: ScrollText, end: false },
+] as const;
 
 export function AdminLayout() {
   return (
@@ -36,12 +38,13 @@ export function AdminLayout() {
 
 function AdminLayoutInner() {
   const { user, signOut } = useAuth();
+  const { locale } = useLocale();
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex" dir="rtl">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex" dir={locale === 'en' ? 'ltr' : 'rtl'}>
       <aside className="w-64 bg-gradient-to-b from-sky-900 to-emerald-700 text-white flex flex-col">
         <div className="p-6 border-b border-white/10">
-          <p className="text-sm text-emerald-200 mb-1">لوحة الإدارة</p>
-          <h1 className="text-xl font-bold">ثمير</h1>
+          <p className="text-sm text-emerald-200 mb-1">{bi(locale, 'لوحة الإدارة', 'Admin')}</p>
+          <h1 className="text-xl font-bold">{bi(locale, 'ثمير', 'Thumair')}</h1>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {NAV.map((item) => (
@@ -56,7 +59,7 @@ function AdminLayoutInner() {
               }
             >
               <item.icon className="size-5" />
-              {item.label}
+              {bi(locale, item.labelAr, item.labelEn)}
             </NavLink>
           ))}
         </nav>
@@ -68,7 +71,7 @@ function AdminLayoutInner() {
             className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
           >
             <LogOut className="size-4" />
-            تسجيل الخروج
+            {bi(locale, 'تسجيل الخروج', 'Sign out')}
           </button>
         </div>
       </aside>

@@ -2,6 +2,8 @@ import { Link, useNavigate } from 'react-router';
 import { X, Heart, User, Settings, Trash2, LogOut } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
+import { bi } from '../i18n/bilingual';
 
 interface ProfileSidebarProps {
   isOpen: boolean;
@@ -12,6 +14,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
   const { favorites, removeFromFavorites } = useFavorites();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { locale } = useLocale();
 
   const handleLogout = async () => {
     await logout();
@@ -39,7 +42,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           {/* Header - Account Info */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-sky-900 to-emerald-600 text-white">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">الحساب الشخصي</h2>
+              <h2 className="text-2xl font-bold">{bi(locale, 'الحساب الشخصي', 'My account')}</h2>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-white/20 rounded-lg transition"
@@ -58,9 +61,13 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
                 )}
               </div>
               <div>
-                <h3 className="text-xl font-bold">{user?.name || 'مستخدم'}</h3>
+                <h3 className="text-xl font-bold">{user?.name || bi(locale, 'مستخدم', 'User')}</h3>
                 <p className="text-emerald-200 text-sm">
-                  {user?.userType === 'buyer' ? 'مشتري' : user?.userType === 'farmer' ? 'مزارع' : 'مورد'}
+                  {user?.userType === 'buyer'
+                    ? bi(locale, 'مشتري', 'Buyer')
+                    : user?.userType === 'farmer'
+                      ? bi(locale, 'مزارع', 'Farmer')
+                      : bi(locale, 'مورد', 'Supplier')}
                 </p>
               </div>
             </div>
@@ -73,7 +80,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-lg transition backdrop-blur-sm"
               >
                 <User className="size-4" />
-                <span className="text-sm font-semibold">الملف الشخصي</span>
+                <span className="text-sm font-semibold">{bi(locale, 'الملف الشخصي', 'Profile')}</span>
               </Link>
               <Link
                 to="/settings"
@@ -81,7 +88,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-lg transition backdrop-blur-sm"
               >
                 <Settings className="size-4" />
-                <span className="text-sm font-semibold">الإعدادات</span>
+                <span className="text-sm font-semibold">{bi(locale, 'الإعدادات', 'Settings')}</span>
               </Link>
             </div>
           </div>
@@ -90,7 +97,7 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Heart className="size-5 text-red-500 fill-red-500" />
-              المنتجات المفضلة ({favorites.length})
+              {bi(locale, 'المنتجات المفضلة', 'Favorite products')} ({favorites.length})
             </h3>
           </div>
 
@@ -100,10 +107,10 @@ export function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
               <div className="text-center py-12">
                 <Heart className="size-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 mb-2">
-                  لا توجد منتجات مفضلة بعد
+                  {bi(locale, 'لا توجد منتجات مفضلة بعد', 'No favorites yet')}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-500">
-                  ابدأ بإضافة منتجاتك المفضلة لتظهر هنا
+                  {bi(locale, 'ابدأ بإضافة منتجاتك المفضلة لتظهر هنا', 'Start adding favorites to see them here')}
                 </p>
               </div>
             ) : (

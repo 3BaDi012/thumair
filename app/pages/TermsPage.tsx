@@ -1,8 +1,198 @@
 import { Link } from 'react-router';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { FileText, CheckCircle, XCircle, AlertTriangle, Scale, Users, Package } from 'lucide-react';
+import { useLocale } from '../context/LocaleContext';
 
 export function TermsPage() {
+  const { locale } = useLocale();
+
+  if (locale === 'en') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
+        <header className="bg-white border-b border-sky-200 sticky top-0 z-10 shadow-sm">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+            <Link to="/home">
+              <ThumairLogoWithText />
+            </Link>
+            <Link to="/home" className="text-sm text-sky-900 hover:text-sky-700 transition">
+              Back to home ←
+            </Link>
+          </div>
+        </header>
+
+        <div className="container mx-auto px-6 py-12 max-w-4xl">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center size-20 bg-gradient-to-br from-sky-900 to-emerald-600 text-white rounded-2xl mb-6">
+              <FileText className="size-10" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4" style={{ color: '#0C4A6E' }}>
+              Terms & Conditions
+            </h1>
+            <p className="text-gray-600">Last updated: Apr 28, 2026</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8 text-gray-700 leading-relaxed">
+            <section>
+              <h2 className="text-2xl font-bold mb-3" style={{ color: '#0C4A6E' }}>
+                Overview
+              </h2>
+              <p>
+                By accessing or using Thumair, you agree to these Terms & Conditions. Please read them carefully before using
+                our services.
+              </p>
+              <div className="mt-4 p-4 bg-emerald-50 border-l-4 border-emerald-600 rounded">
+                <p className="text-emerald-900 font-semibold">Our motto: Connect · Empower · Sustain</p>
+                <p className="text-sm text-emerald-700 mt-1">
+                  We connect farmers to markets, enable fair trade, and support a sustainable agricultural sector.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <Scale className="size-5 text-emerald-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Platform nature
+                </h2>
+              </div>
+              <p className="font-semibold text-sky-900 mb-3">Thumair is a digital marketplace intermediary and does not:</p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <XCircle className="size-5 text-red-600" />
+                    <span className="font-bold text-red-900">We do not</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Buy or sell products directly</li>
+                    <li>• Own listed products</li>
+                    <li>• Guarantee product quality</li>
+                    <li>• Interfere in commercial negotiations</li>
+                  </ul>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="size-5 text-green-600" />
+                    <span className="font-bold text-green-900">We do</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Provide a platform for listings and requests</li>
+                    <li>• Facilitate communication between parties</li>
+                    <li>• Offer user verification</li>
+                    <li>• Provide a transparent rating system</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+                  <Users className="size-5 text-cyan-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  User obligations
+                </h2>
+              </div>
+              <div className="space-y-4">
+                <div className="pl-6 border-l-4 border-sky-200">
+                  <h3 className="font-bold text-sky-900 mb-2">Farmers / sellers</h3>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Provide accurate listing information</li>
+                    <li>• Honor quantities and prices</li>
+                    <li>• Keep listings up to date</li>
+                    <li>• Follow quality and food safety standards</li>
+                  </ul>
+                </div>
+                <div className="pl-6 border-l-4 border-sky-200">
+                  <h3 className="font-bold text-sky-900 mb-2">Buyers</h3>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Act in good faith</li>
+                    <li>• Honor agreements</li>
+                    <li>• Do not abuse the rating system</li>
+                  </ul>
+                </div>
+                <div className="pl-6 border-l-4 border-sky-200">
+                  <h3 className="font-bold text-sky-900 mb-2">Suppliers</h3>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Provide professional services/products</li>
+                    <li>• Honor pricing and timelines</li>
+                    <li>• Provide reasonable warranties where applicable</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Package className="size-5 text-purple-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Transactions & payments
+                </h2>
+              </div>
+              <div className="bg-sky-50 rounded-xl p-6 space-y-2 text-sm">
+                <p>• Payments and financial transactions occur directly between parties.</p>
+                <p>• The platform is not responsible for financial disputes between users.</p>
+                <p>• We recommend documenting agreements and retaining payment receipts.</p>
+              </div>
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6 mt-4">
+                <p className="font-bold text-amber-900 mb-2">Platform fee</p>
+                <p className="text-sm">
+                  A 1% platform fee may apply to successful transactions completed via the platform (subject to applicable
+                  rules and the current fee policy displayed in the product experience).
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <AlertTriangle className="size-5 text-amber-600" />
+                </div>
+                <h2 className="text-2xl font-bold" style={{ color: '#0C4A6E' }}>
+                  Prohibited use
+                </h2>
+              </div>
+              <ul className="space-y-2 text-sm">
+                <li>• Posting false or misleading information</li>
+                <li>• Listing illegal or prohibited products</li>
+                <li>• Impersonation or fake accounts</li>
+                <li>• Harassment, threats, or abuse</li>
+                <li>• Attempts to hack or manipulate data</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold mb-3" style={{ color: '#0C4A6E' }}>
+                Liability & dispute resolution
+              </h2>
+              <p className="text-sm">
+                We encourage users to resolve disputes amicably. The platform may assist with mediation where possible, but
+                is not a party to transactions and is not liable for damages arising from user-to-user dealings.
+              </p>
+            </section>
+
+            <section className="bg-sky-50 rounded-xl p-6">
+              <h2 className="text-xl font-bold mb-3" style={{ color: '#0C4A6E' }}>
+                Contact
+              </h2>
+              <p className="text-sm">
+                Questions about these terms? Email: <a className="text-sky-900 hover:underline" href="mailto:thumair.sa@hotmail.com">thumair.sa@hotmail.com</a>
+              </p>
+            </section>
+
+            <div className="text-center text-sm text-gray-500 pt-6 border-t border-gray-200">
+              By using Thumair, you acknowledge that you have read and agree to these Terms & Conditions.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       <header className="bg-white border-b border-sky-200 sticky top-0 z-10 shadow-sm">
@@ -287,8 +477,8 @@ export function TermsPage() {
             <div className="space-y-2 text-gray-700">
               <p className="font-semibold">البريد الإلكتروني: <a href="mailto:thumair.sa@hotmail.com" className="text-sky-900 hover:underline">thumair.sa@hotmail.com</a></p>
               <p className="font-semibold">الهاتف: <a href="tel:+966505650213" className="text-sky-900 hover:underline" dir="ltr">+966 50 565 0213</a></p>
-              <p className="font-semibold">تويتر: <a href="https://twitter.com/thumair_sa" className="text-sky-900 hover:underline" target="_blank" rel="noopener">@thumair_sa</a></p>
-              <p className="font-semibold">إنستغرام: <a href="https://instagram.com/thumair_sa" className="text-sky-900 hover:underline" target="_blank" rel="noopener">@thumair_sa</a></p>
+              <p className="font-semibold">تويتر: <a href="https://x.com/thumair_sa" className="text-sky-900 hover:underline" target="_blank" rel="noopener">@thumair_sa</a></p>
+              <p className="font-semibold">إنستغرام: <a href="https://instagram.com/thumair.sa" className="text-sky-900 hover:underline" target="_blank" rel="noopener">@thumair.sa</a></p>
             </div>
           </section>
 

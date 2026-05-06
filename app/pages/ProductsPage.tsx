@@ -6,17 +6,18 @@ import { useFavorites } from '../context/FavoritesContext';
 import { useAuth } from '../context/AuthContext';
 import { ProfileSidebar } from '../components/ProfileSidebar';
 import { NotificationsSidebar } from '../components/NotificationsSidebar';
-import { LanguageToggle } from '../components/LanguageToggle';
 import { NotificationBell } from '../components/NotificationBell';
 import { supabase } from '../lib/supabaseClient';
 import type { ListingSummary } from '../context/FavoritesContext';
 import { useT } from '../i18n/useT';
-import { CATEGORIES } from '../lib/categories';
+import { CATEGORIES, categoryLabel } from '../lib/categories';
+import { bi } from '../i18n/bilingual';
 
 export function ProductsPage() {
   const { category } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(category || 'الكل');
+  const ALL_CATEGORY = '__all__';
+  const [selectedCategory, setSelectedCategory] = useState<string>(category ?? ALL_CATEGORY);
   const [priceRange, setPriceRange] = useState('all');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -25,7 +26,7 @@ export function ProductsPage() {
   const { t, locale } = useT();
 
   const dashboardPath = useMemo(() => {
-    if (!user?.userType) return '/welcome';
+    if (!user?.userType) return '/home';
     return user.userType === 'buyer' ? '/dashboard/buyer' : '/dashboard/farmer';
   }, [user?.userType]);
 
@@ -98,7 +99,7 @@ export function ProductsPage() {
   const filteredListings = useMemo(() => {
     const q = searchQuery.trim();
     return listings.filter((l) => {
-      const matchesCategory = selectedCategory === 'الكل' || l.category === selectedCategory;
+      const matchesCategory = selectedCategory === ALL_CATEGORY || l.category === selectedCategory;
       const matchesSearch = !q || l.title.includes(q) || (l.orgName?.includes(q) ?? false);
       const price = l.priceMin ?? l.priceMax ?? null;
       const matchesPrice =
@@ -122,14 +123,15 @@ export function ProductsPage() {
   const categories = useMemo(() => {
     const total = listings.length;
     return [
-      { name: 'الكل', emoji: '🌾', count: total },
+      { value: ALL_CATEGORY, label: bi(locale, 'الكل', 'All'), emoji: '🌾', count: total },
       ...CATEGORIES.map((c) => ({
-        name: c.name,
+        value: c.value,
+        label: c.label[locale],
         emoji: c.emoji,
-        count: categoryCounts.get(c.name) ?? 0,
+        count: categoryCounts.get(c.value) ?? 0,
       })),
     ];
-  }, [categoryCounts, listings.length]);
+  }, [categoryCounts, listings.length, locale]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -140,7 +142,6 @@ export function ProductsPage() {
           </Link>
 
           <div className="flex items-center gap-4">
-            <LanguageToggle />
             {isAuthenticated ? (
               <>
                 <Link
@@ -160,7 +161,11 @@ export function ProductsPage() {
                   <div className="text-right">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">{user?.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {user?.userType === 'buyer' ? (locale === 'en' ? 'Buyer' : 'مشتري') : user?.userType === 'farmer' ? (locale === 'en' ? 'Farmer' : 'مزارع') : locale === 'en' ? 'Supplier' : 'مورد'}
+                      {user?.userType === 'buyer'
+                        ? bi(locale, 'مشتري', 'Buyer')
+                        : user?.userType === 'farmer'
+                          ? bi(locale, 'مزارع', 'Farmer')
+                          : bi(locale, 'مورد', 'Supplier')}
                     </p>
                   </div>
                 </button>
@@ -212,15 +217,15 @@ export function ProductsPage() {
               {categories.map((cat, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedCategory(cat.name)}
+                  onClick={() => setSelectedCategory(cat.value)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition ${
-                    selectedCategory === cat.name
+                    selectedCategory === cat.value
                       ? 'bg-emerald-600 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <span>{cat.emoji}</span>
-                  <span>{cat.name}</span>
+                  <span>{cat.label}</span>
                   <span className="text-xs opacity-75">({cat.count})</span>
                 </button>
               ))}
@@ -282,7 +287,9 @@ export function ProductsPage() {
                     <h3 className="font-bold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
                       {listing.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{listing.orgName ?? 'مزرعة'}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {listing.orgName ?? bi(locale, 'مزرعة', 'Farm')}
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-1 mb-3 text-sm">
@@ -298,7 +305,7 @@ export function ProductsPage() {
                         {listing.priceMin ?? listing.priceMax ?? '—'}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {listing.currency}/{listing.unit ?? 'وحدة'}
+                        {listing.currency}/{listing.unit ?? bi(locale, 'وحدة', 'unit')}
                       </p>
                     </div>
                   </Link>
@@ -328,7 +335,9 @@ export function ProductsPage() {
 
         {!isLoading && filteredListings.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">لا توجد منتجات تطابق البحث</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">
+              {bi(locale, 'لا توجد منتجات تطابق البحث', 'No products match your search')}
+            </p>
           </div>
         )}
       </div>

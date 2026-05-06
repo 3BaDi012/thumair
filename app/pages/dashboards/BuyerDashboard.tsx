@@ -5,6 +5,8 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import { CsatPrompt } from '../../components/CsatPrompt';
+import { useLocale } from '../../context/LocaleContext';
+import { bi } from '../../i18n/bilingual';
 
 type OrderRow = {
   id: string;
@@ -19,14 +21,18 @@ type OrderRow = {
   } | null;
 };
 
-const STATUS_AR: Record<string, string> = {
-  pending: 'قيد المراجعة',
-  confirmed: 'مؤكد',
-  shipped: 'قيد الشحن',
-  delivered: 'تم التسليم',
-  cancelled: 'ملغى',
-  disputed: 'نزاع',
+const STATUS_LABELS: Record<string, { ar: string; en: string }> = {
+  pending: { ar: 'قيد المراجعة', en: 'Pending' },
+  confirmed: { ar: 'مؤكد', en: 'Confirmed' },
+  shipped: { ar: 'قيد الشحن', en: 'Shipped' },
+  delivered: { ar: 'تم التسليم', en: 'Delivered' },
+  cancelled: { ar: 'ملغى', en: 'Cancelled' },
+  disputed: { ar: 'نزاع', en: 'Disputed' },
 };
+
+function statusLabel(locale: 'ar' | 'en', status: string): string {
+  return STATUS_LABELS[status]?.[locale] ?? status;
+}
 
 function imageUrlFromListing(row: OrderRow): string | null {
   const paths = row.listings?.listing_images ?? [];
@@ -39,6 +45,7 @@ function imageUrlFromListing(row: OrderRow): string | null {
 export function BuyerDashboard() {
   const { favorites, removeFromFavorites } = useFavorites();
   const { supabaseUser } = useAuth();
+  const { locale } = useLocale();
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [csatOrderIds, setCsatOrderIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -105,8 +112,12 @@ export function BuyerDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">مرحباً بك في ثمير</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">تتبع طلباتك وتصفح منتجاتك المفضلة</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          {bi(locale, 'مرحباً بك في ثمير', 'Welcome to Thumair')}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          {bi(locale, 'تتبع طلباتك وتصفح منتجاتك المفضلة', 'Track your orders and browse your favorite products')}
+        </p>
       </div>
 
       {error && (
@@ -131,7 +142,7 @@ export function BuyerDashboard() {
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-blue-100 text-sm">الطلبات النشطة</p>
+              <p className="text-blue-100 text-sm">{bi(locale, 'الطلبات النشطة', 'Active orders')}</p>
               <p className="text-3xl font-bold">{activeOrders}</p>
             </div>
             <div className="size-14 bg-white/20 rounded-full flex items-center justify-center">
@@ -143,7 +154,7 @@ export function BuyerDashboard() {
         <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-green-100 text-sm">الطلبات المكتملة</p>
+              <p className="text-green-100 text-sm">{bi(locale, 'الطلبات المكتملة', 'Completed orders')}</p>
               <p className="text-3xl font-bold">{completedOrders}</p>
             </div>
             <div className="size-14 bg-white/20 rounded-full flex items-center justify-center">
@@ -155,7 +166,7 @@ export function BuyerDashboard() {
         <div className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-red-100 text-sm">المنتجات المفضلة</p>
+              <p className="text-red-100 text-sm">{bi(locale, 'المنتجات المفضلة', 'Favorites')}</p>
               <p className="text-3xl font-bold">{favorites.length}</p>
             </div>
             <div className="size-14 bg-white/20 rounded-full flex items-center justify-center">
@@ -169,22 +180,26 @@ export function BuyerDashboard() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Heart className="size-6 text-red-500 fill-red-500" />
-            المنتجات المفضلة ({favorites.length})
+            {bi(locale, 'المنتجات المفضلة', 'Favorite products')} ({favorites.length})
           </h2>
           <Link to="/products" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-semibold">
-            تصفح المزيد ←
+            {bi(locale, 'تصفح المزيد ←', 'Browse more ←')}
           </Link>
         </div>
         {favorites.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl p-12 text-center">
             <Heart className="size-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">لا توجد منتجات مفضلة بعد</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">ابدأ بإضافة منتجاتك المفضلة لتظهر هنا</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              {bi(locale, 'لا توجد منتجات مفضلة بعد', 'No favorites yet')}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {bi(locale, 'ابدأ بإضافة منتجاتك المفضلة لتظهر هنا', 'Start adding favorites to see them here')}
+            </p>
             <Link
               to="/products"
               className="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
             >
-              تصفح المنتجات
+              {bi(locale, 'تصفح المنتجات', 'Browse products')}
             </Link>
           </div>
         ) : (
@@ -208,7 +223,9 @@ export function BuyerDashboard() {
                     <h3 className="font-bold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
                       {product.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{product.orgName ?? 'مزرعة'}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      {product.orgName ?? bi(locale, 'مزرعة', 'Farm')}
+                    </p>
                     <div className="flex items-center gap-1 mb-3">
                       <span className="text-sm text-gray-500 dark:text-gray-400">{product.city ?? '—'}</span>
                     </div>
@@ -221,7 +238,7 @@ export function BuyerDashboard() {
                       <button
                         onClick={() => void removeFromFavorites(product.id)}
                         className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
-                        title="إزالة من المفضلة"
+                        title={bi(locale, 'إزالة من المفضلة', 'Remove from favorites')}
                       >
                         <Trash2 className="size-4" />
                       </button>
@@ -229,7 +246,7 @@ export function BuyerDashboard() {
                         to={`/listing/${product.id}`}
                         className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm"
                       >
-                        طلب
+                        {bi(locale, 'طلب', 'Order')}
                       </Link>
                     </div>
                   </div>
@@ -244,19 +261,21 @@ export function BuyerDashboard() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Package className="size-6 text-emerald-600 dark:text-emerald-400" />
-            طلباتي
+            {bi(locale, 'طلباتي', 'My orders')}
           </h2>
         </div>
         <div className="p-6">
           {loading ? (
-            <p className="text-gray-500">جارٍ التحميل...</p>
+            <p className="text-gray-500">{bi(locale, 'جارٍ التحميل...', 'Loading...')}</p>
           ) : orders.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-400">لا توجد طلبات بعد. تصفح المنتجات وقدّم طلباً.</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              {bi(locale, 'لا توجد طلبات بعد. تصفح المنتجات وقدّم طلباً.', "No orders yet. Browse products and place your first order.")}
+            </p>
           ) : (
             <div className="space-y-4">
               {orders.map((order) => {
                 const img = imageUrlFromListing(order);
-                const title = order.listings?.title ?? 'منتج';
+                const title = order.listings?.title ?? bi(locale, 'منتج', 'Product');
                 const total = order.quantity * order.unit_price;
                 return (
                   <div
@@ -274,17 +293,17 @@ export function BuyerDashboard() {
                       <div className="min-w-0">
                         <h3 className="font-semibold text-gray-900 dark:text-white truncate">{title}</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          الكمية: {order.quantity} × {order.unit_price} {order.currency}
+                          {bi(locale, 'الكمية:', 'Quantity:')} {order.quantity} × {order.unit_price} {order.currency}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1 mt-1">
                           <Clock className="size-3 shrink-0" />
-                          {new Date(order.created_at).toLocaleDateString('ar-SA')}
+                          {new Date(order.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'ar-SA')}
                         </p>
                       </div>
                     </div>
                     <div className="text-left shrink-0 mr-2">
                       <p className="font-bold text-emerald-600 dark:text-emerald-400 mb-2 whitespace-nowrap">
-                        {total.toLocaleString('ar-SA')} {order.currency}
+                        {total.toLocaleString(locale === 'en' ? 'en-US' : 'ar-SA')} {order.currency}
                       </p>
                       <span
                         className={`text-xs px-3 py-1 rounded-full whitespace-nowrap ${
@@ -295,7 +314,7 @@ export function BuyerDashboard() {
                               : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                         }`}
                       >
-                        {STATUS_AR[order.status] ?? order.status}
+                        {statusLabel(locale, order.status)}
                       </span>
                     </div>
                   </div>

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { X, Bell, MessageSquare, ShoppingBag, Newspaper, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { useLocale } from '../context/LocaleContext';
+import { bi } from '../i18n/bilingual';
 
 interface NotificationsSidebarProps {
   isOpen: boolean;
@@ -20,6 +22,7 @@ interface NotificationRow {
 
 export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarProps) {
   const { supabaseUser } = useAuth();
+  const { locale } = useLocale();
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -103,10 +106,10 @@ export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarPr
                   <Bell className="size-6" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">الإشعارات</h2>
+                  <h2 className="text-2xl font-bold">{bi(locale, 'الإشعارات', 'Notifications')}</h2>
                   {unreadCount > 0 && (
                     <p className="text-sm text-emerald-200">
-                      {unreadCount} إشعار جديد
+                      {unreadCount} {bi(locale, 'إشعار جديد', 'new notifications')}
                     </p>
                   )}
                 </div>
@@ -123,15 +126,17 @@ export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarPr
           {/* Notifications List */}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="text-center py-12 px-6 text-gray-600 dark:text-gray-400">جارٍ تحميل الإشعارات...</div>
+              <div className="text-center py-12 px-6 text-gray-600 dark:text-gray-400">
+                {bi(locale, 'جارٍ تحميل الإشعارات...', 'Loading notifications...')}
+              </div>
             ) : notifications.length === 0 ? (
               <div className="text-center py-12 px-6">
                 <Bell className="size-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 mb-2">
-                  لا توجد إشعارات
+                  {bi(locale, 'لا توجد إشعارات', 'No notifications')}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-500">
-                  سنعلمك عندما يكون هناك جديد
+                  {bi(locale, 'سنعلمك عندما يكون هناك جديد', "We'll let you know when there's something new")}
                 </p>
               </div>
             ) : (
