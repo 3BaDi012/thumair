@@ -10,6 +10,7 @@ export type MessageKey =
   | 'common.cancel'
   | 'auth.email'
   | 'auth.password'
+  | 'auth.accountDoesNotExist'
   | 'auth.login'
   | 'auth.signup'
   | 'settings.title'
@@ -26,6 +27,7 @@ const MESSAGES: Record<Locale, Record<MessageKey, string>> = {
     'common.cancel': 'إلغاء',
     'auth.email': 'البريد الإلكتروني',
     'auth.password': 'كلمة المرور',
+    'auth.accountDoesNotExist': 'هذا الحساب غير موجود',
     'auth.login': 'تسجيل الدخول',
     'auth.signup': 'إنشاء الحساب',
     'settings.title': 'الإعدادات',
@@ -41,6 +43,7 @@ const MESSAGES: Record<Locale, Record<MessageKey, string>> = {
     'common.cancel': 'Cancel',
     'auth.email': 'Email',
     'auth.password': 'Password',
+    'auth.accountDoesNotExist': "This account doesn't exist",
     'auth.login': 'Log in',
     'auth.signup': 'Create account',
     'settings.title': 'Settings',

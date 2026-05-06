@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Mail, Lock, ShoppingCart, Store } from 'lucide-react';
+import { Mail, Lock, ShoppingCart, Store, Eye, EyeOff } from 'lucide-react';
 import { ThumairLogoWithText } from '../components/ThumairLogo';
 import { useAuth } from '../context/AuthContext';
 import { useT } from '../i18n/useT';
 import { dashboardPathForUser } from '../lib/dashboardPath';
+import { supabase } from '../lib/supabaseClient';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export function LoginPage() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     userType: '',
     email: '',
@@ -36,6 +38,16 @@ export function LoginPage() {
     try {
       await signInWithPassword({ email: formData.email, password: formData.password });
       const refreshed = await refreshProfile();
+
+      const desired = formData.userType === 'farmer' ? 'farmer' : 'buyer';
+      const actual = refreshed?.userType;
+      if (actual && actual !== desired) {
+        await supabase.auth.signOut().catch(() => undefined);
+        setError(t('auth.accountDoesNotExist'));
+        setIsSubmitting(false);
+        return;
+      }
+
       navigate(dashboardPathForUser(refreshed), { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ أثناء تسجيل الدخول');
@@ -149,14 +161,22 @@ export function LoginPage() {
                   <div className="relative">
                     <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                      className="w-full pr-12 pl-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                       placeholder="••••••••"
                       autoComplete="current-password"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((p) => !p)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700"
+                      aria-label={showPassword ? (locale === 'en' ? 'Hide password' : 'إخفاء كلمة المرور') : locale === 'en' ? 'Show password' : 'إظهار كلمة المرور'}
+                    >
+                      {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                    </button>
                   </div>
                 </div>
 
