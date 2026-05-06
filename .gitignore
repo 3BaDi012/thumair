@@ -22,3 +22,9 @@ supabase/.branches/
 coverage/
 .vercel
 .netlify
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
